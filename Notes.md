@@ -33,6 +33,32 @@
     - [Iterating over Hashes](#iterating-over-hashes)
     - [Hashes as Optional Parameters](#hashes-as-optional-parameters)
     - [Common Hash Methods](#common-hash-methods)
+  - [METHODS](#methods-1)
+    - [Creating a Method](#creating-a-method)
+    - [What Methods Return](#what-methods-return)
+    - [Chaining Methods](#chaining-methods)
+    - [Predicate Methods and Bang Methods](#predicate-methods-and-bang-methods)
+  - [ENUMERABLES](#enumerables)
+    - [select and reject](#select-and-reject)
+    - [each and each_with_index](#each-and-each_with_index)
+    - [map](#map)
+    - [select or filter](#select-or-filter)
+    - [reduce](#reduce)
+    - [include?](#include)
+    - [any?](#any)
+    - [all?](#all)
+    - [none?](#none)
+    - [Other methods](#other-methods)
+  - [NESTED COLLECTIONS](#nested-collections)
+    - [Nested Arrays](#nested-arrays)
+      - [Accessing Elements in Nested Arrays](#accessing-elements-in-nested-arrays)
+      - [Creating Nested Array](#creating-nested-array)
+      - [Adding and Removing Elements in Nested Arrays](#adding-and-removing-elements-in-nested-arrays)
+      - [Iterating Over Nested Arrays](#iterating-over-nested-arrays)
+    - [Nested Hashes](#nested-hashes)
+      - [Accessing Data in Nested Hashes](#accessing-data-in-nested-hashes)
+      - [Adding and Removing Data in Nested Hashes](#adding-and-removing-data-in-nested-hashes)
+      - [Methods for Nested Arrays](#methods-for-nested-arrays)
 
 ## CONTROL FLOW
 
@@ -901,4 +927,642 @@ name_and_age.keys.each { |k| puts k }
 # Bob
 # Steve
 # Joe
+```
+
+## METHODS
+
+### Creating a Method
+
+```ruby
+def my_name
+  "Joe Smith"
+end
+
+puts my_name    #=> "Joe Smith"
+```
+
+**Parameters and Arguments:**
+
+Parameters are variables that your method will receive when it is called.
+
+The differences are between an argument and a parameter is that a *parameters* act as placeholder variables in the template of your method, whereas *arguments* are the actual variables that get passed to the method when it is called.
+
+```ruby
+def greet(name)
+  "Hello, " + name + "!"
+end
+
+puts greet("John") #=> Hello, John!
+```
+
+```ruby
+def greet(name = "stranger")       # Default parameter: "stranger"
+  "Hello, " + name + "!"
+end
+
+puts greet("Jane") #=> Hello, Jane!
+puts greet #=> Hello, stranger!
+```
+
+### What Methods Return
+
+Ruby offers implicit `return`; both following codes work the same:
+
+```ruby
+def my_name
+  return "Joe Smith"
+end
+
+puts my_name #=> "Joe Smith"
+```
+
+```ruby
+def my_name
+  "Joe Smith"
+end
+
+puts my_name #=> "Joe Smith"
+```
+
+```ruby
+def even_odd(number)
+  if number % 2 == 0
+    "That is an even number."
+  else
+    "That is an odd number."
+  end
+end
+```
+
+An explicit return can be useful when you want to write a method that checks for input errors before continuing.
+
+```ruby
+def even_odd(number)
+  unless number.is_a? Numeric
+    return "A number was not entered."
+  end
+
+  if number % 2 == 0
+    "That is an even number."
+  else
+    "That is an odd number."
+  end
+end
+
+puts even_odd(20) #=>  That is an even number.
+puts even_odd("Ruby") #=>  A number was not entered.
+```
+
+### Chaining Methods
+
+```ruby
+phrase = ["be", "to", "not", "or", "be", "to"]
+
+puts phrase.reverse.join(" ").capitalize
+#=> "To be or not to be"
+```
+
+### Predicate Methods and Bang Methods
+
+**Predicate Methods** have a question mark at the end of their names. They return Boolean values.
+
+```ruby
+puts 5.even?  #=> false
+puts 6.even?  #=> true
+puts 17.odd?  #=> true
+
+puts 12.between?(10, 15)  #=> true
+```
+
+**Bang Methods** have an exclamaton mark at the end of their names. They reassign the value of a variable, mutating it.
+
+```ruby
+whisper = "HELLO EVERYBODY"
+
+puts whisper.downcase #=> "hello everybody"
+puts whisper #=> "HELLO EVERYBODY
+
+puts whisper.downcase! #=> "hello everybody"
+puts whisper #=> "hello everybody"
+```
+
+## ENUMERABLES
+
+### select and reject
+
+```ruby
+friends = ['Sharon', 'Leo', 'Leila', 'Brian', 'Arun']
+
+friends.select { |friend| friend != 'Brian' }
+ #=> ["Sharon", "Leo", "Leila", "Arun"]
+ ```
+
+ ```ruby
+ friends = ['Sharon', 'Leo', 'Leila', 'Brian', 'Arun']
+
+friends.reject { |friend| friend == 'Brian' }
+ #=> ["Sharon", "Leo", "Leila", "Arun"]
+ ```
+
+### each and each_with_index
+
+Return the **original array or hash** regardless of what happens inside the code block
+
+**each:**
+
+ ```ruby
+ friends = ['Sharon', 'Leo', 'Leila', 'Brian', 'Arun']
+
+friends.each { |friend| puts "Hello, " + friend }
+
+#=> Hello, Sharon
+#=> Hello, Leo
+#=> Hello, Leila
+#=> Hello, Brian
+#=> Hello, Arun
+
+#=> ["Sharon", "Leo", "Leila", "Brian" "Arun"] // returns original value
+```
+
+```ruby
+my_array = [1, 2]
+
+my_array.each do |num|
+  num *= 2
+  puts "The new number is #{num}."
+end
+
+#=> The new number is 2.
+#=> The new number is 4.
+
+#=> [1, 2]
+```
+
+on `hashes`:
+
+```ruby
+my_hash = { "one" => 1, "two" => 2 }
+
+my_hash.each { |key, value| puts "#{key} is #{value}" }
+
+one is 1
+two is 2
+#=> { "one" => 1, "two" => 2}
+
+my_hash.each { |pair| puts "the pair is #{pair}" }
+
+the pair is ["one", 1]
+the pair is ["two", 2]
+#=> { "one" => 1, "two" => 2}
+```
+
+```ruby
+friends = ['Sharon', 'Leo', 'Leila', 'Brian', 'Arun']
+
+friends.each { |friend| friend.upcase }
+
+#=> ['Sharon', 'Leo', 'Leila', 'Brian', 'Arun'] // always return original value
+```
+
+**each_with_index:**
+
+```ruby
+fruits = ["apple", "banana", "strawberry", "pineapple"]
+
+fruits.each_with_index { |fruit, index| puts fruit if index.even? }
+
+#=> apple
+#=> strawberry
+#=> ["apple", "banana", "strawberry", "pineapple"]
+```
+
+### map
+
+```ruby
+friends = ['Sharon', 'Leo', 'Leila', 'Brian', 'Arun']
+
+friends.map { |friend| friend.upcase }
+#=> `['SHARON', 'LEO', 'LEILA', 'BRIAN', 'ARUN']`
+```
+
+```ruby
+my_order = ['medium Big Mac', 'medium fries', 'medium milkshake']
+
+my_order.map { |item| item.gsub('medium', 'extra large') }
+#=> ["extra large Big Mac", "extra large fries", "extra large milkshake"]
+
+# String#gsub(pattern, replacement) returns a copy of self with all occurrences of the given pattern replaced
+```
+
+```ruby
+salaries = [1200, 1500, 1100, 1800]
+
+salaries.map { |salary| salary - 700 }
+#=> [500, 800, 400, 1100]
+```
+
+**map.with_._index:**
+
+```ruby
+array = %w(a b c)
+
+array.map.with_index { |ch, idx| [ch, idx] }
+
+# [["a", 0], ["b", 1], ["c", 2]]
+```
+
+### select or filter
+
+```ruby
+friends = ['Sharon', 'Leo', 'Leila', 'Brian', 'Arun']
+
+friends.select { |friend| friend != 'Brian' }
+
+ #=> ["Sharon", "Leo", "Leila", "Arun"]
+```
+
+```ruby
+responses = { 'Sharon' => 'yes', 'Leo' => 'no', 'Leila' => 'no', 'Arun' => 'yes' }
+
+responses.select { |person, response| response == 'yes'}
+#=> {"Sharon"=>"yes", "Arun"=>"yes"}
+```
+
+### reduce
+
+The #reduce method reduces an array or hash down to a single object.
+
+```ruby
+my_numbers = [5, 6, 7, 8]
+
+my_numbers.reduce { |sum, number| sum + number }
+#=> 26
+```
+
+- The first block variable in the `#reduce` enumerable (`sum` in this example) is known as the accumulator.
+- The result of each iteration is stored in the accumulator and then passed to the next iteration.
+- The accumulator is also the value that the `#reduce` method returns at the end.
+- By default, the initial value of the accumulator is the first element in the collection.
+
+1. Iteration 0: `sum = 5 + 6 = 11`
+2. Iteration 1: `sum = 11 + 7 = 18`
+3. Iteration 2: `sum = 18 + 8 = 26`
+
+- We can also set a different initial value for the accumulator by directly passing in a value to the #reduce method
+
+```ruby
+my_numbers = [5, 6, 7, 8]
+
+my_numbers.reduce(1000) { |sum, number| sum + number }
+#=> 1026
+```
+
+```ruby
+votes = ["Bob's Dirty Burger Shack", "St. Mark's Bistro", "Bob's Dirty Burger Shack"]
+
+votes.reduce(Hash.new(0)) do |result, vote|
+  result[vote] += 1
+  result
+end
+#=> {"Bob's Dirty Burger Shack"=>2, "St. Mark's Bistro"=>1}
+```
+
+### include?
+
+```ruby
+numbers = [5, 6, 7, 8]
+
+numbers.include?(6)
+#=> true
+
+numbers.include?(3)
+#=> false
+```
+
+```ruby
+friends = ['Sharon', 'Leo', 'Leila', 'Brian', 'Arun']
+
+invited_list = friends.select { |friend| friend != 'Brian' }
+
+invited_list.include?('Brian')
+#=> false
+```
+
+### any?
+
+```ruby
+numbers = [21, 42, 303, 499, 550, 811]
+
+numbers.any? { |number| number > 500 }
+#=> true
+
+numbers.any? { |number| number < 20 }
+#=> false
+```
+
+### all?
+
+```ruby
+fruits = ["apple", "banana", "strawberry", "pineapple"]
+
+fruits.all? { |fruit| fruit.length > 3 }
+#=> true
+
+fruits.all? { |fruit| fruit.length > 6 }
+#=> false
+```
+
+### none?
+
+```ruby
+fruits = ["apple", "banana", "strawberry", "pineapple"]
+
+fruits.none? { |fruit| fruit.length > 10 }
+#=> true
+
+fruits.none? { |fruit| fruit.length > 6 }
+#=> false
+```
+
+### Other methods
+
+**group_by:**
+
+```ruby
+names = ["James", "Bob", "Joe", "Mark", "Jim"]
+
+names.group_by{|name| name.length}
+# => {5=>["James"], 3=>["Bob", "Joe", "Jim"], 4=>["Mark"]} 
+```
+
+**#grep:** returns an array with those items that actualy match the specified criteria (RegEx) (using a `===` match)
+
+```ruby
+> names.grep(/J/)
+# => ["James", "Joe", "Jim"]
+```
+
+## NESTED COLLECTIONS
+
+### Nested Arrays
+
+An array that contains other arrays is called a nested array, or a multidimensional array.
+
+```ruby
+test_scores = [
+  [97, 76, 79, 93],
+  [79, 84, 76, 79],
+  [88, 67, 64, 76],
+  [94, 55, 67, 81]
+]
+
+teacher_mailboxes = [
+  ["Adams", "Baker", "Clark", "Davis"],
+  ["Jones", "Lewis", "Lopez", "Moore"],
+  ["Perez", "Scott", "Smith", "Young"]
+]
+```
+
+#### Accessing Elements in Nested Arrays
+
+`array[x][y]`, where `x` is the index of the nested element and `y` is the index inside of the nested element
+
+```ruby
+teacher_mailboxes[0][0]
+#=> "Adams"
+teacher_mailboxes[1][0]
+#=> "Jones"
+teacher_mailboxes[2][0]
+#=> "Perez"
+```
+
+```ruby
+teacher_mailboxes[0][-1]
+#=> "Davis"
+teacher_mailboxes[-1][0]
+#=> "Perez"
+teacher_mailboxes[-1][-2]
+#=> "Smith"
+```
+
+- If you try to access an index of a nonexistent nested element, it will raise an `NoMethodError`, because the `nil` class does not have a `[]` method.
+- However, just like a regular array, if you try to access a nonexistent index inside of an existing nested element, it will return `nil`
+
+```ruby
+teacher_mailboxes[3][0]
+#=> NoMethodError
+teacher_mailboxes[0][4]
+#=> nil
+```
+
+**dig method:**
+
+```ruby
+teacher_mailboxes.dig(3, 0)
+#=> nil
+teacher_mailboxes.dig(0, 4)
+#=> nil
+```
+
+#### Creating Nested Array
+
+- Create a new array by calling the `Array.new` method with up to 2 optional arguments (initial size and default value), like `Array.new(3, 7)`
+- The second optional argument, for the default value, should only be used with an immutable object such as a `number`, `boolean` value, or `symbol`.
+- Using a `string`, `array`, `hash`, or other mutable object may result in confusing behavior because each default value in the array will actually be a reference to the same default value.
+- Therefore, any change to one of the elements will change all of the elements in the array.
+
+```ruby
+mutable = Array.new(3, Array.new(2))
+#=> [[nil, nil], [nil, nil], [nil, nil]]
+mutable[0][0] = 1000
+#=> 1000
+mutable
+#=> [[1000, nil], [1000, nil], [1000, nil]]
+```
+
+- To create an array of mutable objects, you will need to pass the default value for `Array.new` via a block, using curly braces, instead of the second optional argument.
+- The code in the block gets evaluated for every slot in the array, creating multiple objects to initialize the array with, rather than references to the same object.
+
+```ruby
+immutable = Array.new(3) { Array.new(2) }
+#=> [[nil, nil], [nil, nil], [nil, nil]]
+immutable[0][0] = 1000
+#=> 1000
+immutable
+#=> [[1000, nil], [nil, nil], [nil, nil]]
+```
+
+#### Adding and Removing Elements in Nested Arrays
+
+```ruby
+test_scores = [
+  [97, 76, 79, 93],
+  [79, 84, 76, 79],
+  [88, 67, 64, 76],
+  [94, 55, 67, 81]
+]
+
+test_scores << [100, 99, 98, 97]
+#=> [[97, 76, 79, 93], [79, 84, 76, 79], [88, 67, 64, 76], [94, 55, 67, 81], [100, 99, 98, 97]]
+test_scores[0].push(100)
+#=> [97, 76, 79, 93, 100]
+test_scores
+#=> [[97, 76, 79, 93, 100], [79, 84, 76, 79], [88, 67, 64, 76], [94, 55, 67, 81], [100, 99, 98, 97]]
+```
+
+```ruby
+test_scores.pop
+#=> [100, 99, 98, 97]
+test_scores[0].pop
+#=> 100
+test_scores
+#=> [[97, 76, 79, 93], [79, 84, 76, 79], [88, 67, 64, 76], [94, 55, 67, 81]]
+```
+
+#### Iterating Over Nested Arrays
+
+```ruby
+teacher_mailboxes = [
+  ["Adams", "Baker", "Clark", "Davis"],
+  ["Jones", "Lewis", "Lopez", "Moore"],
+  ["Perez", "Scott", "Smith", "Young"]
+]
+
+teacher_mailboxes.each_with_index do |row, row_index|
+  puts "Row:#{row_index} = #{row}"
+end
+#=> Row:0 = ["Adams", "Baker", "Clark", "Davis"]
+#=> Row:1 = ["Jones", "Lewis", "Lopez", "Moore"]
+#=> Row:2 = ["Perez", "Scott", "Smith", "Young"]
+#=> [["Adams", "Baker", "Clark", "Davis"], ["Jones", "Lewis", "Lopez", "Moore"], ["Perez", "Scott", "Smith", "Young"]]
+```
+
+```ruby
+teacher_mailboxes.each_with_index do |row, row_index|
+  row.each_with_index do |teacher, column_index|
+    puts "Row:#{row_index} Column:#{column_index} = #{teacher}"
+  end
+end
+#=> Row:0 Column:0 = Adams
+#=> Row:0 Column:1 = Baker
+#=> Row:0 Column:2 = Clark
+#=> Row:0 Column:3 = Davis
+#=> Row:1 Column:0 = Jones
+#=> Row:1 Column:1 = Lewis
+#=> Row:1 Column:2 = Lopez
+#=> Row:1 Column:3 = Moore
+#=> Row:2 Column:0 = Perez
+#=> Row:2 Column:1 = Scott
+#=> Row:2 Column:2 = Smith
+#=> Row:2 Column:3 = Young
+#=> [["Adams", "Baker", "Clark", "Davis"], ["Jones", "Lewis", "Lopez", "Moore"], ["Perez", "Scott", "Smith", "Young"]]
+```
+
+**flatten:**
+
+```ruby
+teacher_mailboxes.flatten.each do |teacher|
+  puts "#{teacher} is amazing!"
+end
+#=> Adams is amazing!
+#=> Baker is amazing!
+#=> Clark is amazing!
+#=> Davis is amazing!
+#=> Jones is amazing!
+#=> Lewis is amazing!
+#=> Lopez is amazing!
+#=> Moore is amazing!
+#=> Perez is amazing!
+#=> Scott is amazing!
+#=> Smith is amazing!
+#=> Young is amazing!
+#=> ["Adams", "Baker", "Clark", "Davis", "Jones", "Lewis", "Lopez", "Moore", "Perez", "Scott", "Smith", "Young"]
+```
+
+### Nested Hashes
+
+```ruby
+vehicles = {
+  alice: {year: 2019, make: "Toyota", model: "Corolla"},
+  blake: {year: 2020, make: "Volkswagen", model: "Beetle"},
+  caleb: {year: 2020, make: "Honda", model: "Accord"}
+}
+```
+
+#### Accessing Data in Nested Hashes
+
+```ruby
+vehicles[:alice][:year]
+#=> 2019
+vehicles[:blake][:make]
+#=> "Volkswagen"
+vehicles[:caleb][:model]
+#=> "Accord"
+```
+
+```ruby
+vehicles[:zoe][:year]
+#=> NoMethodError
+vehicles.dig(:zoe, :year)
+#=> nil
+vehicles[:alice][:color]
+#=> nil
+vehicles.dig(:alice, :color)
+#=> nil
+```
+
+#### Adding and Removing Data in Nested Hashes
+
+```ruby
+vehicles[:dave] = {year: 2021, make: "Ford", model: "Escape"}
+#=> {:year=>2021, :make=>"Ford", :model=>"Escape"}
+vehicles
+#=> {:alice=>{:year=>2019, :make=>"Toyota", :model=>"Corolla"}, :blake=>{:year=>2020, :make=>"Volkswagen", :model=>"Beetle"}, :caleb=>{:year=>2020, :make=>"Honda", :model=>"Accord"}, :dave=>{:year=>2021, :make=>"Ford", :model=>"Escape"}}
+```
+
+```ruby
+vehicles[:dave][:color] = "red"
+#=> "red"
+vehicles
+#=> {:alice=>{:year=>2019, :make=>"Toyota", :model=>"Corolla"}, :blake=>{:year=>2020, :make=>"Volkswagen", :model=>"Beetle"}, :caleb=>{:year=>2020, :make=>"Honda", :model=>"Accord"}, :dave=>{:year=>2021, :make=>"Ford", :model=>"Escape", :color=>"red"}}
+```
+
+```ruby
+vehicles.delete(:blake)
+#=> {:year=>2020, :make=>"Volkswagen", :model=>"Beetle"}
+vehicles
+#=> {:alice=>{:year=>2019, :make=>"Toyota", :model=>"Corolla"}, :caleb=>{:year=>2020, :make=>"Honda", :model=>"Accord"}, :dave=>{:year=>2021, :make=>"Ford", :model=>"Escape", :color=>"red"}}
+```
+
+```ruby
+vehicles[:dave].delete(:color)
+#=> "red"
+vehicles
+#=> {:alice=>{:year=>2019, :make=>"Toyota", :model=>"Corolla"}, :caleb=>{:year=>2020, :make=>"Honda", :model=>"Accord"}, :dave=>{:year=>2021, :make=>"Ford", :model=>"Escape"}}
+```
+
+#### Methods for Nested Arrays
+
+```ruby
+vehicles.select { |name, data| data[:year] >= 2020 }
+#=> {:caleb=>{:year=>2020, :make=>"Honda", :model=>"Accord"}, :dave=>{:year=>2021, :make=>"Ford", :model=>"Escape"}}
+```
+
+```ruby
+vehicles.collect { |name, data| name if data[:year] >= 2020 }
+#=> [nil, :caleb, :dave]
+
+# return 'nil' if statement is false
+```
+
+```ruby
+vehicles.collect { |name, data| name if data[:year] >= 2020 }.compact
+#=> [:caleb, :dave]
+
+# same as above, but compact takes 'nil' away
+```
+
+```ruby
+vehicles.filter_map { |name, data| name if data[:year] >= 2020 }
+#=> [:caleb, :dave]
 ```
