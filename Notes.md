@@ -24,6 +24,15 @@
     - [Basic Methods](#basic-methods)
     - [Convert Array Into String - And Vice Versa](#convert-array-into-string---and-vice-versa)
     - [Slicing an Array](#slicing-an-array)
+  - [HASHES](#hashes)
+    - [Creating Hashes](#creating-hashes)
+    - [Accessing Values](#accessing-values)
+    - [Adding and Changing Data](#adding-and-changing-data)
+    - [Methods](#methods)
+    - [Symbols as Hash Keys](#symbols-as-hash-keys)
+    - [Iterating over Hashes](#iterating-over-hashes)
+    - [Hashes as Optional Parameters](#hashes-as-optional-parameters)
+    - [Common Hash Methods](#common-hash-methods)
 
 ## CONTROL FLOW
 
@@ -690,4 +699,206 @@ All elements but the first one:
 a[1..-1]
 
 # => [2, 3, 4, 5]
+```
+
+## HASHES
+
+### Creating Hashes
+
+```ruby
+my_hash = {
+  "a random word" => "ahoy",
+  "Dorothy's math test score" => 94,
+  "an array" => [1, 2, 3],
+  "an empty hash within a hash" => {}
+}
+```
+
+```ruby
+my_hash = Hash.new
+my_hash               #=> {}
+```
+
+```ruby
+hash = { 9 => "nine", :six => 6 }
+```
+
+### Accessing Values
+
+```ruby
+shoes = {
+  "summer" => "sandals",
+  "winter" => "boots"
+}
+
+shoes["summer"]   #=> "sandals"
+shoes["hiking"]   #=> nil
+```
+
+Returning `nil` for accessing a value might cause a problem. Method `fetch` will throw an error.
+
+```ruby
+shoes.fetch("hiking")   #=> KeyError: key not found: "hiking"
+shoes.fetch("hiking", "hiking boots") #=> "hiking boots"
+
+# This method can return a default value instead of raising an error if the given key is not found.
+```
+
+### Adding and Changing Data
+
+**Adding Data:**
+
+```ruby
+shoes["fall"] = "sneakers"
+
+shoes     #=> {"summer"=>"sandals", "winter"=>"boots", "fall"=>"sneakers"}
+```
+
+**Changing Data:**
+
+```ruby
+shoes["summer"] = "flip-flops"
+shoes     #=> {"summer"=>"flip-flops", "winter"=>"boots", "fall"=>"sneakers"}
+```
+
+**Removing Data:**
+
+```ruby
+shoes.delete("summer")    #=> "flip-flops"
+shoes                     #=> {"winter"=>"boots", "fall"=>"sneakers"}
+```
+
+### Methods
+
+```ruby
+books = {
+  "Infinite Jest" => "David Foster Wallace",
+  "Into the Wild" => "Jon Krakauer"
+}
+
+books.keys      #=> ["Infinite Jest", "Into the Wild"]
+books.values    #=> ["David Foster Wallace", "Jon Krakauer"]
+```
+
+**Merging Two Hashes:**
+
+Values from the hash getting merged in (in this case, the values in `hash2`) overwrite the values of the hash getting merged at (`hash1`) when the two hashes have a key that is the same.
+
+```ruby
+hash1 = { "a" => 100, "b" => 200 }
+hash2 = { "b" => 254, "c" => 300 }
+hash1.merge(hash2)      #=> { "a" => 100, "b" => 254, "c" => 300 }
+```
+
+### Symbols as Hash Keys
+
+Symbols are predominantly because they are far more performant than strings in Ruby, and they also allow for a much cleaner syntax when defining hashes.
+
+```ruby
+# 'Rocket' syntax
+american_cars = {
+  :chevrolet => "Corvette",
+  :ford => "Mustang",
+  :dodge => "Ram"
+}
+# 'Symbols' syntax
+japanese_cars = {
+  honda: "Accord",
+  toyota: "Corolla",
+  nissan: "Altima"
+}
+
+american_cars[:ford]    #=> "Mustang"
+japanese_cars[:honda]   #=> "Accord"
+```
+
+### Iterating over Hashes
+
+```ruby
+person = {name: 'bob', height: '6 ft', weight: '160 lbs', hair: 'brown'}
+
+person.each do |key, value|
+  puts "Bob's #{key} is #{value}"
+end
+
+# Bob's name is bob
+# Bob's height is 6 ft
+# Bob's weight is 160 lbs
+# Bob's hair is brown
+```
+
+### Hashes as Optional Parameters
+
+```ruby
+def greeting(name, options = {})
+  if options.empty?
+    puts "Hi, my name is #{name}"
+  else
+    puts "Hi, my name is #{name} and I'm #{options[:age]}" +
+         " years old and I live in #{options[:city]}."
+  end
+end
+
+greeting("Bob")
+# Hi, my name is Bob
+
+greeting("Bob", {age: 62, city: "New York City"})
+# Hi, my name is Bob and I'm 62 years old and I live in New York City.
+```
+
+Curly braces are not required when a hash is the last argument
+
+```ruby
+greeting("Bob", age: 62, city: "New York City")
+# Hi, my name is Bob and I'm 62 years old and I live in New York City.
+```
+
+### Common Hash Methods
+
+**key?**
+
+```ruby
+name_and_age = { "Bob" => 42, "Steve" => 31, "Joe" => 19}
+#=> {"Bob"=>42, "Steve"=>31, "Joe"=>19}
+
+name_and_age.key?("Steve")
+# => true
+
+name_and_age.key?("Larry")
+# => false
+```
+
+**select:**
+
+```ruby
+name_and_age.select { |k,v| k == "Bob" }
+# => {"Bob"=>42}
+
+name_and_age.select { |k,v| (k == "Bob") || (v == 19) }
+# => {"Bob"=>42, "Joe"=>19}
+```
+
+**to_a:**
+
+```ruby
+name_and_age.to_a
+# => [["Bob", 42], ["Steve", 31], ["Joe", 19]]
+
+name_and_age
+# => {"Bob"=>42, "Steve"=>31, "Joe"=>19}
+```
+
+**keys and values:**
+
+```ruby
+irb :0011 > name_and_age.keys
+# => ["Bob", "Steve", "Joe"]
+
+irb :0012 > name_and_age.values
+# => [42, 31, 19]
+
+name_and_age.keys.each { |k| puts k }
+# Bob
+# Steve
+# Joe
 ```
