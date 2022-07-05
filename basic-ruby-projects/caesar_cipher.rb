@@ -2,7 +2,7 @@ def caesar_cipher(str, pos)
   ord = str.chars.map(&:ord)
   to_char = []
 
-  for num in ord
+  ord.each do |num|
     if num >= 97 && num <= 122 || num >= 65 && num <= 90
       num += pos
       num -= 26 if num > 122 || num > 90 && num < 97
