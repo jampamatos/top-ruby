@@ -1,7 +1,8 @@
 # Ruby Basics Exercises
+
 These exercises are designed to complement the [Ruby Basic lessons](https://www.theodinproject.com/paths/full-stack-ruby-on-rails/courses/ruby#basic-ruby) on [The Odin Project](https://www.theodinproject.com/). Each folder contains exercises and specs (tests) for the lessons in the Ruby Basics section.
 
-### Usage
+## Usage
 
 1. First change directory into the lesson directory, for example `cd 1_data_types`.
 2. Run the tests for an exercise file, for example `bundle exec rspec spec/numbers_exercises_spec.rb`. The first test will fail and the rest will be skipped.
@@ -14,36 +15,36 @@ These exercises are designed to complement the [Ruby Basic lessons](https://www.
 
 **TIP**: When there is only one exercise file in a directory (such as in `6_arrays`) you can omit the path to the file and just enter `bundle exec rspec` to run the tests in that file.
 
-###  Contents
+## Contents
 
-#### 1.Basic Data Types
+### 1.Basic Data Types
 
-- [ ] Numbers Exercises
-- [ ] Strings Exercises
+- [X] Numbers Exercises
+- [X] Strings Exercises
 
 #### 6.Arrays
 
-- [ ] Array Exercises
+- [X] Array Exercises
 
 #### 7.Hashes
 
-- [ ] Hash Exercises
+- [X] Hash Exercises
 
 #### 8.Methods
 
-- [ ] Method Exercises
+- [X] Method Exercises
 
 #### 9.Debugging
 
-- [ ] Debugging Exercises
+- [X] Debugging Exercises
 
 #### 10.Basic Enumerables
 
-- [ ] Basic Enumerable Exercises
+- [X] Basic Enumerable Exercises
 
 #### 11.Predicate Enumerables
 
-- [ ] Predicate Enumerable Exercises
+- [X] Predicate Enumerable Exercises
 
 #### 12.Nested Collections
 
