@@ -59,6 +59,10 @@
       - [Accessing Data in Nested Hashes](#accessing-data-in-nested-hashes)
       - [Adding and Removing Data in Nested Hashes](#adding-and-removing-data-in-nested-hashes)
       - [Methods for Nested Arrays](#methods-for-nested-arrays)
+  - [OBJECT ORIENTED PROGRAMMING](#object-oriented-programming)
+    - [Classes](#classes)
+    - [Variables and Classes](#variables-and-classes)
+    - [Class Inheritance](#class-inheritance)
 
 ## CONTROL FLOW
 
@@ -1565,4 +1569,159 @@ vehicles.collect { |name, data| name if data[:year] >= 2020 }.compact
 ```ruby
 vehicles.filter_map { |name, data| name if data[:year] >= 2020 }
 #=> [:caleb, :dave]
+```
+
+## OBJECT ORIENTED PROGRAMMING
+
+### Classes
+
+```ruby
+class Language
+  def initialize(name, creator)
+    @name = name
+    @creator = creator
+  end
+
+  def description
+    puts "I'm #{@name} and I was created by #{@creator}!"
+  end
+end
+
+ruby = Language.new("Ruby", "Yukihiro Matsumoto")
+python = Language.new("Python", "Guido van Rossum")
+javascript = Language.new("JavaScript", "Brendan Eich")
+
+ruby.description
+# => I'm Ruby and I was created by Yukihiro Matsumoto!
+python.description
+# => I'm Python and I was created by Guido van Rossum!
+javascript.description
+# => I'm JavaScript and I was created by Brendan Eich!
+```
+
+- In a Ruby class, an `initialize` method is used to generate new instances of the class.
+- It is usually the first method of a class.
+
+```ruby
+class Car
+  def initialize(make, model) 
+    @make = make
+    @model = model
+  end
+end
+ 
+kitt = Car.new("Pontiac", "Trans Am")
+# instance kitt of the class Car
+```
+
+### Variables and Classes
+
+- **Instance variable** hold a value specific to each instance of that class, not to all members of the class itself. In Ruby, the `@` symbol is used to signify an instance variable, like `@make`
+- **Class variables** are like instance variables, but instead of belonging to an instance of a class, they belong to the class itself. Class variables always start with two `@`s, like so: `@@files`.
+  - Because there’s only one copy of a class variable shared by all instances of a class, we can for example use a class variable to keep track of the number of instances of that class we’ve created.
+
+```ruby
+class Person
+  @@people_count = 0
+  
+  def initialize(name)
+    @name = name
+    @@people_count += 1
+  end
+  
+  def self.number_of_instances
+    @@people_count
+  end
+end
+
+matz = Person.new("Yukihiro")
+dhh = Person.new("David")
+
+puts "Number of Person instances: #{Person.number_of_instances}"
+# => Number of Person instances: 2
+```
+
+- **Global variables** can be declared in two ways. The first is one that’s already familiar to you: you just define the variable outside of any method or class, and voilà! It’s global. If you want to make a variable global from inside a method or class, just start it with a `$`, like so: `$matz`.
+
+### Class Inheritance
+
+```ruby
+class DerivedClass < BaseClass
+  # Some stuff!
+end
+```
+
+```ruby
+class Application
+  def initialize(name)
+    @name = name
+  end
+end
+
+class MyApp < Application
+  # inherits methods from Application class such as #initialize
+end
+```
+
+**Override:**
+
+```ruby
+class Creature
+  def initialize(name)
+    @name = name
+  end
+  
+  def fight
+    return "Punch to the chops!"
+  end
+end
+
+class Dragon < Creature
+  def fight                  # overrides fight method
+    return "Breathes fire!"
+  end
+end
+```
+
+- Keyword `super` access methods from Parent class original method that was overridden in Derived Class
+
+```ruby
+class Creature
+  def initialize(name)
+    @name = name
+  end
+  
+  def fight
+    return "Punch to the chops!"
+  end
+end
+
+# Add your code below!
+class Dragon < Creature
+  def fight
+    puts "Instead of breathing fire..."
+    return super
+  end
+end
+```
+
+Ruby does not allow **multiple inheritance** on Classes.
+
+```ruby
+class Creature
+  def initialize(name)
+    @name = name
+  end
+end
+
+class Person
+  def initialize(name)
+    @name = name
+  end
+end
+
+class Dragon < Creature; end
+class Dragon < Person; end
+
+# superclass mismatch for class Dragon
 ```
