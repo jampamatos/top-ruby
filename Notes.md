@@ -63,6 +63,8 @@
     - [Classes](#classes)
     - [Variables and Classes](#variables-and-classes)
     - [Class Inheritance](#class-inheritance)
+    - [Reader and Writer](#reader-and-writer)
+    - [Module](#module)
 
 ## CONTROL FLOW
 
@@ -1724,4 +1726,218 @@ class Dragon < Creature; end
 class Dragon < Person; end
 
 # superclass mismatch for class Dragon
+```
+
+- A **class method** provides functionality to a *class itself*, while an **instance method** provides functionality to *one instance of a class*.
+- We cannot call an instance method on the class itself, and we cannot directly call a class method on an instance.
+
+```ruby
+class Machine
+  def Machine.hello
+    puts "Hello from the machine!"
+  end
+end
+```
+
+**Private Methods:**
+
+- Ruby allows to explicitly make some methods **public** and others **private**. Public methods allow for an **interface** with the rest of the program; it can now access the `Class`  and it's `instance`s.
+- **Private methods** are unreachable. You can only call these methods from other code inside the object -- an *explicit receiver*.
+
+```ruby
+class Person
+  def initialize(name, age)
+    @name = name
+    @age = age
+  end
+  
+  public    # This method can be called from outside the class.
+  
+  def about_me
+    puts "I'm #{@name} and I'm #{@age} years old!"
+  end
+  
+  private   # This method can't!
+  
+  def bank_account_number
+    @account_number = 12345
+    puts "My bank account number is #{@account_number}."
+  end
+end
+
+eric = Person.new("Eric", 26)
+eric.about_me
+# => I'm Eric and I'm 26 years old!
+
+eric.bank_account_number
+# private method `bank_account_number' called for #<Context::Person:0x000000015306c8 @name="Eric", @age=26>
+```
+
+### Reader and Writer
+
+Ruby needs methods in order to access attributes.
+
+```ruby
+class Person
+  def initialize(name)
+    @name = name
+  end
+end
+
+jampa = Person.new("Jampa")
+jampa.name
+# NoMethodError (undefined method `name' for #<Person:0x000055db9955c8f8 @name="Jampa">)
+```
+
+```ruby
+class Person
+  def initialize(name)
+    @name = name
+  end
+
+  def name
+    @name
+  end
+end
+
+jampa = Person.new("Jampa")
+jampa.name
+# => "Jampa"
+jampa.name = "Jumpa"
+# NoMethodError (undefined method `name=' for #<Person:0x000055db9955c8f8 @name="Jampa">)
+```
+
+We can use attr_reader to access a variable and attr_writer to change it.
+
+```ruby
+class Person
+  attr_reader :name
+  attr_writer :name
+
+  def initialize(name)
+    @name = name
+  end
+
+end
+
+jampa = Person.new("Jampa")
+jampa.name
+# => "Jampa"
+jampa.name = "Jumpa"
+# => "Jumpa"
+```
+
+An attribute with a `writer` and a `reader` can be accessed with `attr_accessor`
+
+```ruby
+class Person
+  attr_accessor :name
+
+  def initialize(name)
+    @name = name
+  end
+
+end
+
+jampa = Person.new("Jampa")
+jampa.name
+# => "Jampa"
+jampa.name = "Jumpa"
+# => "Jumpa"
+```
+
+### Module
+
+- You can think of a module as a toolbox that contains a set methods and constants.
+- Modules as are like classes, but they can’t create instances and can’t have subclasses.
+- One of the main purposes of modules is to separate methods and constants into named spaces.
+
+```ruby
+module Circle
+
+  PI = 3.141592653589793
+  
+  def Circle.area(radius)
+    PI * radius**2
+  end
+  
+  def Circle.circumference(radius)
+    2 * PI * radius
+  end
+end
+```
+
+A class can `include` a module to be able to use its methods.
+
+```ruby
+class Angle
+include Math
+  
+  attr_accessor :radians
+  
+  def initialize(radians)
+    @radians = radians
+  end
+  
+  def cosine
+    cos(@radians)
+  end
+end
+
+acute = Angle.new(1)
+acute.cosine
+```
+
+When a module is used to mix additional behavior and information into a class, it’s called a **mixin**.
+
+```ruby
+module Action
+  def jump
+    @distance = rand(4) + 2
+    puts "I jumped forward #{@distance} feet!"
+  end
+end
+
+class Rabbit
+  include Action
+  attr_reader :name
+  def initialize(name)
+    @name = name
+  end
+end
+
+class Cricket
+  include Action
+  attr_reader :name
+  def initialize(name)
+    @name = name
+  end
+end
+
+peter = Rabbit.new("Peter")
+jiminy = Cricket.new("Jiminy")
+
+peter.jump
+# => I jumped forward 3 feet!
+jiminy.jump
+# => I jumped forward 5 feet!
+```
+
+Whereas `include` mixes a module’s methods in at the *instance* level (allowing instances of a particular class to use the methods), the `extend` keyword mixes a module’s methods at the *class* level.
+
+```ruby
+# ThePresent has a .now method that we'll extend to TheHereAnd
+
+module ThePresent
+  def now
+    puts "It's #{Time.new.hour > 12 ? Time.new.hour - 12 : Time.new.hour}:#{Time.new.min} #{Time.new.hour > 12 ? 'PM' : 'AM'} (GMT)."
+  end
+end
+
+class TheHereAnd
+  extend ThePresent
+end
+
+TheHereAnd.now
+# => It's 0:52 AM (GMT).
 ```
