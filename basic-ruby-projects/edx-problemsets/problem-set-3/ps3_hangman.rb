@@ -1,10 +1,10 @@
-WORDLIST_FILE = 'words.txt'
+WORDLIST_FILE = 'words.txt'.freeze
 
 def load_words()
   wordlist = []
 
   File.open(WORDLIST_FILE, 'r') do |f|
-    puts "Loading word list from file..."
+    puts 'Loading word list from file...'
     f.lines.each do |line|
       wordlist.push(*line.split)
     end 
@@ -18,7 +18,7 @@ def choose_word(word_list)
   word_list.sample
 end
 
-word_list = load_words()
+word_list = load_words
 
 def get_guessed_word(secret_word, letters_guessed)
   return_str = ''
@@ -29,5 +29,7 @@ def get_guessed_word(secret_word, letters_guessed)
 end
 
 def get_available_letters(letters_guessed)
-  
+  ('a'..'z').to_a.to_set - letters_guessed.to_set
 end
+
+puts get_available_letters(['a', 'c', 'd'])
