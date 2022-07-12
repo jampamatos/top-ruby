@@ -26,3 +26,11 @@ Returns a word from wordlist at random
 Returns a string, comprised of letters and underscores that represents what letters in secretWord have been guessed so far.
 
 ---
+
+**4.** `get_available_letters(letters_guessed)`
+
+`lettersGuessed`: list, what letters have been guessed so far
+
+Returns a string, comprised of letters that represents what letters have not yet been guessed.
+
+---
