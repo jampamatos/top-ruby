@@ -20,3 +20,14 @@ end
 
 word_list = load_words()
 
+def get_guessed_word(secret_word, letters_guessed)
+  return_str = ''
+  secret_word.each_char do |c|
+    letters_guessed.include?(c) ? return_str += c : return_str += '_'
+  end
+  return_str
+end
+
+def get_available_letters(letters_guessed)
+  
+end
