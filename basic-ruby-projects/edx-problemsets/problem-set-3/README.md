@@ -5,7 +5,7 @@
 **1.** `#load_words()`
 
 Returns a list of valid words. Words are strings of lowercase letters.
-    
+
 Depending on the size of the word list, this function may take a while to finish.
 
 ---
@@ -26,4 +26,3 @@ Returns a word from wordlist at random
 Returns a string, comprised of letters and underscores that represents what letters in secretWord have been guessed so far.
 
 ---
-
