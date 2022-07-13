@@ -46,7 +46,7 @@ end
 
 def display_hand(hand)
   hand.each_key do |letter|
-    (1..hand[letter.to_sym]).each do
+    (1..hand[letter]).each do
       print letter, ' '
     end
   end
@@ -88,18 +88,18 @@ def deal_hand(num)
   #   hand[cons] = hand.fetch(cons, 0) + 1
   # end
 
-  hand.sort_by{ |k, _v| k }.to_h
+  hand
 end
 
 def update_hand(hand, word)
   output = hand.clone
-  word.each_char { |c| output[c.to_sym] -=1 }
+  word.each_char { |c| output[c.to_s] -= 1 }
   output
 end
 
 def valid_word?(word, hand, word_list)
   word_dict = get_freq_dict(word)
-  word_dict.all? { |k, v| v <= hand.fetch(k.to_sym, 0) } && word_list.include?(word)
+  word_dict.all? { |k, v| v <= hand.fetch(k.to_s, 0) } && word_list.include?(word)
 end
 
 def calculate_hand_length(hand)
@@ -149,18 +149,18 @@ def play_game(word_list)
   loop do
     print 'Enter n to deal a new hand, r to replay the last hand, or e to end game: '
     input = gets.chomp.downcase
-
-    if input == 'n'
+    case input
+    when 'n'
       hand = deal_hand(num)
       play_hand(hand, word_list, num)
-    elsif input == 'r'
-      if !hand
+    when 'r'
+      if hand == {}
         puts 'You have not played a hand yet. Please play a new hand first!'
         puts ''
       else
         play_hand(hand, word_list, num)
       end
-    elsif input == 'e'
+    when 'e'
       break
     else
       puts 'Invalid command.'
