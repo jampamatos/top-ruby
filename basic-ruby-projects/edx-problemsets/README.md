@@ -6,6 +6,26 @@ The goal is to practice Ruby sintax and try a little more problem solving as I p
 
 ---
 
+## Table Of Contents
+
+- [**MITx 6.00.1x's Introduction to Computer Science and Programming Using Python** *(but actually using Ruby)*](#mitx-6001xs-introduction-to-computer-science-and-programming-using-python-but-actually-using-ruby)
+  - [Table Of Contents](#table-of-contents)
+  - [Problem Set 1](#problem-set-1)
+    - [Problem 1](#problem-1)
+    - [Problem 2](#problem-2)
+    - [Problem 3](#problem-3)
+  - [Problem Set 2](#problem-set-2)
+    - [Introduction](#introduction)
+    - [Problem 1 - Paying Debt off in a Year](#problem-1---paying-debt-off-in-a-year)
+    - [Problem 2 - Paying Debt Off in a Year](#problem-2---paying-debt-off-in-a-year)
+    - [Problem 3 - Using Bisection Search to Make the Program Faster](#problem-3---using-bisection-search-to-make-the-program-faster)
+  - [Problem Set 3](#problem-set-3)
+    - [Hangman](#hangman)
+  - [Problem Set 4](#problem-set-4)
+    - [6.00 Wordgame](#600-wordgame)
+
+---
+
 ## Problem Set 1
 
 ### Problem 1
@@ -16,6 +36,8 @@ Write a program that counts up the number of vowels contained in the string `s`.
 
 `Number of vowels: 5`
 
+[Back to Top](#table-of-contents)
+
 ### Problem 2
 
 Assume `s` is a string of lower case characters.
@@ -23,6 +45,8 @@ Assume `s` is a string of lower case characters.
 Write a program that prints the number of times the string `'bob'` occurs in s. For example, if `s = 'azcbobobegghakl'`, then your program should print
 
 `Number of times bob occurs is: 2`
+
+[Back to Top](#table-of-contents)
 
 ### Problem 3
 
@@ -35,6 +59,8 @@ Write a program that prints the longest substring of `s` in which the letters oc
 In the case of ties, print the first substring. For example, if `s = 'abcbcd'`, then your program should print
 
 `Longest substring in alphabetical order is: abc`
+
+[Back to Top](#table-of-contents)
 
 ---
 
@@ -74,6 +100,8 @@ Let's look at an example. If you've got a $5,000 balance on a credit card with 1
 
 You can see that a lot of your payment is going to cover interest, and if you work this through month 12, you will see that after a year, you will have paid $1165.63 and yet you will still owe $4691.11 on what was originally a $5000.00 debt. Pretty depressing!
 
+[Back to Top](#table-of-contents)
+
 ### Problem 1 - Paying Debt off in a Year
 
 Write a program to calculate the credit card balance after one year if a person only pays the minimum monthly payment required by the credit card company each month.
@@ -103,6 +131,8 @@ A summary of the required math is found below:
 **Monthly unpaid balance** = (Previous balance) - (Minimum monthly payment)
 **Updated balance each month** = (Monthly unpaid balance) + (Monthly interest rate x Monthly unpaid balance)
 
+[Back to Top](#table-of-contents)
+
 ### Problem 2 - Paying Debt Off in a Year
 
 Now write a program that calculates the minimum **fixed** monthly payment needed in order pay off a credit card balance within 12 months. By a fixed monthly payment, we mean a single number which does not change each month, but instead is a constant amount that will be paid each month.
@@ -125,6 +155,8 @@ Assume that the interest is compounded monthly according to the balance at the e
 **Monthly unpaid balance** = (Previous balance) - (Minimum fixed monthly payment)
 
 **Updated balance each month** = (Monthly unpaid balance) + (Monthly interest rate x Monthly unpaid balance)
+
+[Back to Top](#table-of-contents)
 
 ### Problem 3 - Using Bisection Search to Make the Program Faster
 
@@ -149,11 +181,13 @@ In short:
 
 Write a program that uses these bounds and bisection search (for more info check out [the Wikipedia page on bisection search](https://en.wikipedia.org/wiki/Bisection_method)) to find the smallest monthly payment to the cent (no more multiples of $10) such that we can pay off the debt within a year. Try it out with large inputs, and notice how fast it is (try the same large inputs in your solution to Problem 2 to compare!). Produce the same return value as you did in Problem 2.
 
+[Back to Top](#table-of-contents)
+
 ---
 
 ## Problem Set 3
 
-### Introduction - Hangman
+### Hangman
 
 For this problem, you will implement a variation of the classic wordgame Hangman. For those of you who are unfamiliar with the rules, you may read all about it [here](https://en.wikipedia.org/wiki/Hangman_(game)). In this problem, the second player will always be the computer, who will be picking a word at random.
 
@@ -177,3 +211,35 @@ Here are the requirements for your game:
    - A user loses a guess only when s/he guesses incorrectly.
    - If the user guesses the same letter twice, do not take away a guess - instead, print a message letting them know they've already guessed that letter and ask them to try again.
    - The game should end when the user constructs the full word or runs out of guesses. If the player runs out of guesses (s/he "loses"), reveal the word to the user when the game ends.
+
+[Back to Top](#table-of-contents)
+
+---
+
+## Problem Set 4
+
+### 6.00 Wordgame
+
+In this problem set, you'll implement two versions of a wordgame!
+
+Let's begin by describing the 6.00 wordgame: This game is a lot like Scrabble or Words With Friends, if you've played those. Letters are dealt to players, who then construct one or more words out of their letters. Each **valid** word receives a score, based on the length of the word and the letters in that word.
+
+The rules of the game are as follows:
+
+**Dealing:**
+
+- A player is dealt a hand of n letters chosen at random (assume n=7 for now).
+- The player arranges the hand into as many words as they want out of the letters, using each letter at most once.
+- Some letters may remain unused (these won't be scored).
+
+**Scoring:**
+
+- The score for the hand is the sum of the scores for each word formed.
+- The score for a word is the sum of the points for letters in the word, multiplied by the length of the word, plus 50 points if all n letters are used on the first word created.
+- Letters are scored as in Scrabble; A is worth 1, B is worth 3, C is worth 3, D is worth 2, E is worth 1, and so on. We have defined the dictionary `SCRABBLE_LETTER_VALUES` that maps each lowercase letter to its Scrabble letter value.
+- For example, 'weed' would be worth 32 points ((4+1+1+2) for the four letters, then multiply by len('weed') to get (4+1+1+2)*4 = 32). Be sure to check that the hand actually has 1 'w', 2 'e's, and 1 'd' before scoring the word!
+- As another example, if n=7 and you make the word 'waybill' on the first try, it would be worth 155 points (the base score for 'waybill' is (4+1+4+3+1+1+1)*7=105, plus an additional 50 point bonus for using all n letters).
+
+[Back to Top](#table-of-contents)
+
+---

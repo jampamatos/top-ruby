@@ -3,7 +3,7 @@
 require 'set'
 
 WORDLIST_FILE = 'words.txt'
-Dir.chdir(File.dirname(__FILE__))
+Dir.chdir(File.dirname(__FILE__)) # File in the same directory
 
 def load_words
   wordlist = []
