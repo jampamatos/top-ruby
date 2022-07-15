@@ -169,5 +169,5 @@ def play_game(word_list)
   end
 end
 
-word_list = load_words
-play_game(word_list)
+# word_list = load_words
+# play_game(word_list)

@@ -16,38 +16,40 @@ def comp_choose_word(hand, word_list, num)
   best_w
 end
 
-def comp_play_hand(hand, word_list, num)
+def puts_hand(hand)
+  print 'Current hand: '
+  display_hand(hand)
+  puts ''
+end
+
+def check_comp_word(hand, word_list, num)
+  word = comp_choose_word(hand, word_list, num)
+  break if word == none
+
+  word
+end
+
+def comp_play_hand(hand, word_list, num) # TEST THIS FUNCTION AGAIN
   total_score = 0
 
   while calculate_hand_length(hand).positive?
-    print 'Current hand: '
-    display_hand(hand)
-    puts ''
+    puts_hand(hand)
+    word = check_comp_word(hand, word_list, num)
 
-    word = comp_choose_word(hand, word_list, num)
-    if word == none
-      break
+    if !valid_word?(word, hand, word_list)
+      puts 'This is a terrible error! I need to check my own code!'
     else
-      if !valid_word?(word, hand, word_list)
-        puts 'This is a terrible error! I need to check my own code!'
-      else
-        score = get_word_score(word, num)
-        total_score += score
-        puts "#{word} earned #{score} points. Total: #{total_score} points."
-        hand = update_hand(hand, word)
-        puts ''
-      end
+      score = get_word_score(word, num)
+      total_score += score
+      puts "#{word} earned #{score} points. Total: #{total_score} points."
+      hand = update_hand(hand, word)
+      puts ''
     end
   end
   puts "Total score: #{total_score} points."
 end
 
-def play_game(word_list)
-  hand ={}
-  num = HAND_SIZE
+def play_game(word_list) end
 
-  loop do
-    puts 'Enter n to deal a new hand, r to replay the last hand, or e to end game:'
-    first_p = gets.chomp.downcase
-  end
-end
+word_list = load_words
+play_game(word_list)
