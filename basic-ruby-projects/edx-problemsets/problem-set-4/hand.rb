@@ -8,7 +8,7 @@ class Hand
     @hand = {}
     @vowels = 'aeiou'
     @consonants = 'bcdfghjklmnpqrstvwxyz'
-    @size = 12
+    @size = 7
   end
 
   def deal_hand(num)
@@ -54,10 +54,10 @@ class Hand
     cons
   end
 
-  def merge_hand(vow, con)
-    vows = random_vow(vow)
-    cons = random_cons(con)
-    vows.merge(cons)
+  def merge_hand(vows, cons)
+    vows_dict = random_vow(vows)
+    cons_dict = random_cons(cons)
+    vows_dict.merge(cons_dict)
   end
 end
 
