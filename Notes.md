@@ -65,6 +65,11 @@
     - [Class Inheritance](#class-inheritance)
     - [Reader and Writer](#reader-and-writer)
     - [Module](#module)
+  - [EXCEPTION AND ERROR HANDLING](#exception-and-error-handling)
+    - [Demosntrating Exceptions](#demosntrating-exceptions)
+    - [Flow of Exception Handling](#flow-of-exception-handling)
+    - [Exception and Error Classes](#exception-and-error-classes)
+    - [Exception Error Tree](#exception-error-tree)
 
 ## CONTROL FLOW
 
@@ -1940,4 +1945,221 @@ end
 
 TheHereAnd.now
 # => It's 0:52 AM (GMT).
+```
+
+## EXCEPTION AND ERROR HANDLING
+
+- **Exception-handling** code to conduct program on how to behave when certain criteria are not met, and errors might crash the program.
+
+### Demosntrating Exceptions
+
+- The `Exception` class handles with errors that might happen during runtime, including syntax errors and typos.
+
+```ruby
+a = 10
+b = '42'
+
+puts a + b
+# => String can't be coerced into Integer (TypeError)
+
+# exited with code=1 in 0.198 seconds
+```
+
+- A `begin/rescue` block is typically used on code which we antecipate errors.
+
+```ruby
+a = 10
+b = '42'
+
+begin
+  a + b
+rescue
+  puts "Could not add the variables a (#{a.class}) and b (#{b.class})."
+else
+  puts "a + b is #{a + b}."
+end
+
+# => Could not add the variables a (Integer) and b (String).
+
+# exited with code=0 in 0.129 seconds
+```
+
+- The `puts` statement from the `rescue` clause was exectuted.
+- More than that: program did not crash, `exited with code=0`.
+- Testing with an array of values:
+
+```ruby
+values = [42, 'a', 'r', 9, 5, 10022, 8.7, "sharon", "Libya", "Mars", "12", 98, rand + rand, {:dog=>'cat'}, 100, nil, 200.0000, Object, 680, 3.14, "Steve", 78, "Argo"].shuffle
+
+while values.length > 0
+  a = values.pop
+  b = values.pop 
+  
+  begin
+    a + b
+  rescue
+    puts "Could not add variables a (#{a.class}) and b (#{b.class})"
+  else
+    puts "a + b is #{a + b}"
+  end
+end
+
+# Could not add variables a (Hash) and b (String)
+# Could not add variables a (Class) and b (String)
+# Could not add variables a (Integer) and b (NilClass)
+# Could not add variables a (Float) and b (String)
+# a + b is 81.14
+# a + b is Argor
+# Could not add variables a (String) and b (Float)
+# a + b is 242.0
+# a + b is 10031
+# a + b is 685
+# Could not add variables a (Integer) and b (String)
+# Could not add variables a (String) and b (NilClass)
+
+# exited with code=0 in 0.139 seconds
+```
+
+- This could be resolved with an `if/else` block, but `begin/rescue` lets programmer handle errors.
+
+```ruby
+require 'open-uri'
+require 'timeout'
+
+remote_base_url = 'http://en.wikipedia.org/wiki'
+
+start_year = 1900
+end_year = 2000
+
+(start_year..end_year).each do |yr|
+  begin
+    rpage = URI.open("#{remote_base_url}/#{yr}")
+  rescue StandardError => e
+    puts "Error: #{e}"
+  else
+    rdata = rpage.read
+  ensure
+    puts 'sleeping'
+    sleep 5
+  end
+
+  File.open("copy-of-#{yr}.html", 'w') { |f| f.write(rdata) } if rdata
+end
+```
+
+- `begin`
+  - Starts off the exception-handling block.
+  - Operations that have a risk of failing go into this block
+- `rescue StandardError => e`
+  - This clause includes the code we want to execute in the event if an error or expection.
+  - In this particular case, this code will execute if an `StandardError` class occurs.
+  - The error will be stored in the variable `e` that will be printed out.
+- `else`
+  - If no errors are raised, this clause will execute
+- `ensure`
+  - This clause will be executed, no matter an error/exception was raised or not.
+
+### Flow of Exception Handling
+
+**Using `retry`:**
+
+- The `retry` statement redirects the program back to the begin statement.
+- This is helpful if your begin/rescue block is inside a loop and you want to retry the same command and parameters that previously resulted in failure.
+
+```ruby
+require 'open-uri'
+remote_base_url = "http://en.wikipedia.org/wiki"
+
+[1900, 1910, 'xj3490', 2000].each do |yr|
+ 
+ retries = 3
+ 
+ begin
+   url = "#{remote_base_url}/#{yr}"
+   puts "Getting page #{url}"
+   rpage = open(url)
+ rescue StandardError=>e
+   puts "\tError: #{e}"
+   if retries > 0
+       puts "\tTrying #{retries} more times"
+       retries -= 1
+       sleep 1
+       retry
+   else
+       puts "\t\tCan't get #{yr}, so moving on"
+   end    
+ else
+   puts "\tGot page for #{yr}"
+ ensure   
+   puts "Ensure branch; sleeping"
+   sleep 1
+
+ end
+end
+
+# Getting page http://en.wikipedia.org/wiki/1900
+#    Got page for 1900
+# Ensure branch; sleeping
+# Getting page http://en.wikipedia.org/wiki/1910
+#    Got page for 1910
+# Ensure branch; sleeping
+# Getting page http://en.wikipedia.org/wiki/xj3490
+#    Error: 403 Forbidden
+#    Trying 3 more times
+# Getting page http://en.wikipedia.org/wiki/xj3490
+#    Error: 403 Forbidden
+#    Trying 2 more times
+# Getting page http://en.wikipedia.org/wiki/xj3490
+#    Error: 403 Forbidden
+#    Trying 1 more times
+# Getting page http://en.wikipedia.org/wiki/xj3490
+#    Error: 403 Forbidden
+#       Can't get xj3490, so moving on
+# Ensure branch; sleeping
+# Getting page http://en.wikipedia.org/wiki/2000
+#    Got page for 2000
+# Ensure branch; sleeping
+```
+
+### Exception and Error Classes
+
+- Not all errors are the same, might be necessary to write specific error handlers.
+- Errors in Ruby:
+  - Every tyee of error is derived from the `Exception` class
+  - If your code rescues a `StandardError`, it will only get errors derived from Standard Error
+  - If your code rescues an `Exception`, it will basically handle every possible error that could happen, including all errors of `StandardError` type and its children types.
+  - This might be problematic, as `Interrupt` is also a `Exception` class error, and will be rescued when trying to interrupt (Ctrl + C) a program execution.
+
+### Exception Error Tree
+
+```kernel
+Exception
+    NoMemoryError
+    ScriptError
+        LoadError
+        NotImplementedError
+        SyntaxError
+    SignalException
+        Interrupt
+    StandardError
+        ArgumentError
+        IOError
+            EOFError
+        IndexError
+            StopIteration
+        LocalJumpError
+        NameError
+            NoMethodError
+        RangeError
+            FloatDomainError
+        RegexpError
+        RuntimeError
+        SecurityError
+        SystemCallError
+        SystemStackError
+        ThreadError
+        TypeError
+        ZeroDivisionError
+    SystemExit
+    fatal 
 ```
