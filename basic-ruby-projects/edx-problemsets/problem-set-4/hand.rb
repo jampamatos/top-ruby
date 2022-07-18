@@ -14,8 +14,6 @@ class Hand
   def deal_hand(num)
     num_vowel = num / 3
     num_cons = num - num_vowel
-    p num_vowel
-    p num_cons
 
     @hand = merge_hand(num_vowel, num_cons)
   end
@@ -51,7 +49,7 @@ class Hand
     cons = {}
     (1..num).each do
       con = @consonants.split('').sample
-      cons[con] = cons.fetch(cons, 0) + 1
+      cons[con] = cons.fetch(con, 0) + 1
     end
     cons
   end
@@ -63,7 +61,7 @@ class Hand
   end
 end
 
-# hand = Hand.new
-# hand.display_hand
-# hand.deal_hand(7)
-# hand.display_hand
+hand = Hand.new
+hand.deal_hand(hand.size)
+hand.display_hand
+# puts get_word_score('sought', hand)

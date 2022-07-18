@@ -41,9 +41,3 @@ def get_word_score(word, hand)
 
   score
 end
-
-hand = Hand.new
-hand.deal_hand(hand.size)
-p hand.hand
-hand.display_hand
-# puts get_word_score('sought', hand)
