@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require './messages'
+
 VOWELS = 'aeiou'
 CONSONANTS = 'bcdfghjklmnpqrstvwxyz'
 HAND_SIZE = 7
@@ -27,7 +29,7 @@ end
 def get_freq_dict(sequence)
   iter_seq = sequence.instance_of?(String) ? sequence.split('') : sequence
   freq = {}
-  iter_seq.each { |x| freq[x] = freq.fetch(x, 0) + 1 }
+  iter_seq.each { |char| freq[char] = freq.fetch(char, 0) + 1 }
   freq
 end
 
@@ -45,11 +47,13 @@ def get_word_score(word, num)
 end
 
 def display_hand(hand)
+  print 'Current hand: '
   hand.each_key do |letter|
     (1..hand[letter]).each do
       print letter, ' '
     end
   end
+  puts ''
 end
 
 def random_vow(num)
@@ -70,25 +74,17 @@ def random_cons(num)
   cons
 end
 
+def merge_hand(vow, con)
+  vows = random_vow(vow)
+  cons = random_cons(con)
+  vows.merge(cons)
+end
+
 def deal_hand(num)
-  hand = {}
   num_vowel = num / 3
   num_cons = num - num_vowel
 
-  hand = random_vow(num_vowel).merge(hand)
-  hand = random_cons(num_cons).merge(hand)
-
-  # (1..num_vowel).each do
-  #   vow = VOWELS.split('').sample
-  #   hand[vow] = hand.fetch(vow, 0) + 1
-  # end
-
-  # (num_vowel..num - 1).each do
-  #   cons = CONSONANTS.split('').sample
-  #   hand[cons] = hand.fetch(cons, 0) + 1
-  # end
-
-  hand
+  merge_hand(num_vowel, num_cons)
 end
 
 def update_hand(hand, word)
@@ -97,9 +93,15 @@ def update_hand(hand, word)
   output
 end
 
-def valid_word?(word, hand, word_list)
+def check_valid_word(word, hand, word_list)
   word_dict = get_freq_dict(word)
-  word_dict.all? { |k, v| v <= hand.fetch(k.to_s, 0) } && word_list.include?(word)
+  if word_dict.all? { |k, v| v <= hand.fetch(k.to_s, 0) } && word_list.include?(word)
+    true
+  else
+    puts 'Invalid word, please try again.'
+    puts ''
+    false
+  end
 end
 
 def calculate_hand_length(hand)
@@ -114,60 +116,57 @@ def play_hand(hand, word_list, num)
   score = 0
 
   while calculate_hand_length(hand).positive?
-    print 'Current hand: '
-    display_hand(hand)
-    puts ''
-    print 'Enter word, or a "." to indicate that you are finished: '
-    input = gets.chomp.downcase
+    input = update_hand_msg(hand)
+    break if input == '.'
 
-    if input == '.'
-      break
-    else
-      if !valid_word?(input, hand, word_list)
-        puts 'Invalid word, please try again.'
-        puts ''
-      else
-        points = get_word_score(input, num)
-        score += points
-        puts "#{input} earned #{points} points. Total score: #{score}."
-        puts ''
-        hand = update_hand(hand, input)
-      end
-    end
+    check_valid_word(input, hand, word_list) ? points = get_word_score(input, num) : redo
+    score += points
+    points_msg(input, points, score)
+    hand = update_hand(hand, input)
   end
-  if input == '.'
-    puts "Goodbye! Total score: #{score} points."
+  end_turn(input, score)
+end
+
+def round_control(input, hand, word_list,num)
+  case input
+  when 'n'
+    hand = deal_hand(num)
+    play_hand(hand, word_list, num)
+    hand
+  when 'r'
+    if hand == {}
+      puts 'You have not played a hand yet. Please play a new hand first!'
+      puts ''
+      1
+    else
+      play_hand(hand, word_list, num)
+      hand
+    end
+  when 'e'
+    2
   else
-    puts "Run out of letters. Total score: #{score} points."
+    puts 'Invalid command.'
+    puts ''
+    1
   end
 end
 
-def play_game(word_list)
+def play_round(word_list)
   hand = {}
   num = HAND_SIZE
-
   loop do
-    print 'Enter n to deal a new hand, r to replay the last hand, or e to end game: '
-    input = gets.chomp.downcase
-    case input
-    when 'n'
-      hand = deal_hand(num)
-      play_hand(hand, word_list, num)
-    when 'r'
-      if hand == {}
-        puts 'You have not played a hand yet. Please play a new hand first!'
-        puts ''
-      else
-        play_hand(hand, word_list, num)
-      end
-    when 'e'
+    input = round_menu
+    round = round_control(input, hand, word_list, num)
+    case round
+    when 1
+      next
+    when 2
       break
     else
-      puts 'Invalid command.'
-      puts ''
+      hand = round
     end
   end
 end
 
-# word_list = load_words
-# play_game(word_list)
+word_list = load_words
+play_round(word_list)
