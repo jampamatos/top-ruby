@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require './messages'
+
 VOWELS = 'aeiou'
 CONSONANTS = 'bcdfghjklmnpqrstvwxyz'
 HAND_SIZE = 7
@@ -65,30 +67,15 @@ def random_cons(num)
   cons = {}
   (1..num).each do
     con = CONSONANTS.split('').sample
-    cons[con] = cons.fetch(cons, 0) + 1
+    cons[con] = cons.fetch(con, 0) + 1
   end
   cons
 end
 
 def deal_hand(num)
-  hand = {}
   num_vowel = num / 3
   num_cons = num - num_vowel
-
-  hand = random_vow(num_vowel).merge(hand)
-  hand = random_cons(num_cons).merge(hand)
-
-  # (1..num_vowel).each do
-  #   vow = VOWELS.split('').sample
-  #   hand[vow] = hand.fetch(vow, 0) + 1
-  # end
-
-  # (num_vowel..num - 1).each do
-  #   cons = CONSONANTS.split('').sample
-  #   hand[cons] = hand.fetch(cons, 0) + 1
-  # end
-
-  hand
+  random_vow(num_vowel).merge(random_cons(num_cons))
 end
 
 def update_hand(hand, word)
@@ -104,42 +91,33 @@ end
 
 def calculate_hand_length(hand)
   output = 0
-
   hand.each { |_k, v| output += v }
-
   output
+end
+
+def word_parse(input, num, score, hand)
+  points = get_word_score(input, num)
+  score += points
+  puts "#{input} earned #{points} points. Total score: #{score}."
+  puts ''
+  hand = update_hand(hand, input)
+  [hand, score]
 end
 
 def play_hand(hand, word_list, num)
   score = 0
 
   while calculate_hand_length(hand).positive?
-    print 'Current hand: '
-    display_hand(hand)
-    puts ''
-    print 'Enter word, or a "." to indicate that you are finished: '
-    input = gets.chomp.downcase
+    input = start_hand_msg(hand)
+    break if input == '.'
 
-    if input == '.'
-      break
-    else
-      if !valid_word?(input, hand, word_list)
-        puts 'Invalid word, please try again.'
-        puts ''
-      else
-        points = get_word_score(input, num)
-        score += points
-        puts "#{input} earned #{points} points. Total score: #{score}."
-        puts ''
-        hand = update_hand(hand, input)
-      end
+    unless valid_word?(input, hand, word_list)
+      invalid_word_msg
+      next
     end
+    hand, score = word_parse(input, num, score, hand)
   end
-  if input == '.'
-    puts "Goodbye! Total score: #{score} points."
-  else
-    puts "Run out of letters. Total score: #{score} points."
-  end
+  hand_end_msg(input, score)
 end
 
 def play_game(word_list)
@@ -169,5 +147,5 @@ def play_game(word_list)
   end
 end
 
-# word_list = load_words
-# play_game(word_list)
+word_list = load_words
+play_game(word_list)
