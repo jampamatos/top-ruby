@@ -4,6 +4,8 @@
 class Board
   attr_reader :victory
 
+  @@round = 1
+
   def initialize
     @cells = {
       cell1: 1, cell2: 2, cell3: 3,
@@ -13,9 +15,13 @@ class Board
     @victory = [[1, 2, 3], [4, 5, 6], [7, 8, 9],
                 [1, 4, 7], [2, 5, 8], [3, 6, 9],
                 [1, 5, 9], [3, 5, 7]]
+    @taken_cells = []
   end
 
   def print_board
+    clear_screen
+    puts "Round #{@@round}"
+    puts ''
     puts "
     | #{@cells[:cell1]} | #{@cells[:cell2]} | #{@cells[:cell3]} |
     -------------
@@ -27,7 +33,7 @@ class Board
 
   def make_play(player)
     loop do
-      num = select_cell_msg
+      num = select_cell_msg(player)
       if check_cell(num)
         player_move(num, player)
         break
@@ -41,11 +47,20 @@ class Board
     @victory.include? player.player_cells.sort
   end
 
+  def check_draw
+    @taken_cells.length == 9
+  end
+
+  def update_round
+    @@round += 1
+  end
+
   private
 
   def player_move(num, player)
     change_cell(num, player.symbol)
     player.add_to_cell(num)
+    @taken_cells << num
   end
 
   def change_cell(num, val)
@@ -54,5 +69,13 @@ class Board
 
   def check_cell(num)
     @cells["cell#{num}".to_sym] == num
+  end
+
+  def clear_screen
+    if RUBY_PLATFORM =~ /win32|win64|\.NET|windows|cygwin|mingw32/i
+      system('cls')
+    else
+      system('clear')
+    end
   end
 end

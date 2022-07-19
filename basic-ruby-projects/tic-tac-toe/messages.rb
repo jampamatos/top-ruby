@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-def select_cell_msg
-  puts 'Select one cell number from the board'
+def select_cell_msg(player)
+  puts "Please select one cell number from the board, #{player.name}"
   num = gets.chomp.to_i
   puts ''
   num
@@ -22,20 +22,43 @@ end
 def validate_symbol
   loop do
     puts 'Please select "X", "O", or any other letter as your symbol.'
-    symbol = gets.chomp
+    puts "It cannot be #{Player.symbols_used[0]}." unless Player.symbols_used.empty?
+    symbol = gets.chomp.upcase
     if symbol.length != 1
       puts 'Please enter only one letter.'
     elsif '0123456789'.include? symbol
       puts 'Please enter a non-numeric letter as your symbol.'
+    elsif symbol == Player.symbols_used[0]
+      puts 'You cannot repeat used symbols. Please select a new one.'
     else
-      return symbol.upcase
+      return symbol
     end
   end
 end
 
-def define_p1
+def define_p1_msg
   puts 'First, please tell me your name, Player 1.'
   p1_n = gets.chomp
   p1_s = validate_symbol
+  Player.add_to_symbols(p1_s)
   [p1_n, p1_s]
+end
+
+def define_p2_msg
+  puts 'Now, tell me your name, Player 2.'
+  p2_n = gets.chomp
+  p2_s = validate_symbol
+  Player.add_to_symbols(p2_s)
+  [p2_n, p2_s]
+end
+
+def congrats_msg(player, other)
+  player.add_point
+  puts "Congratulations, #{player.name}! You won!"
+  puts "You now have #{player.points} #{player.points > 1 ? 'points' : 'point'}. #{other.name} have #{other.points} #{other.points > 1 ? 'points' : 'point'}."
+end
+
+def draw_msg(pl1, pl2)
+  puts "It's a draw!"
+  puts "#{pl1.name} have #{pl1.points} points, and #{pl2.name} have #{pl2.points} points."
 end

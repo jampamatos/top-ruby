@@ -4,6 +4,8 @@
 class Player
   attr_reader :name, :symbol, :points, :player_cells
 
+  @@symbol_used = []
+
   def initialize(name, symbol)
     @name = name
     @symbol = symbol
@@ -14,4 +16,17 @@ class Player
   def add_to_cell(num)
     @player_cells << num
   end
+
+  def add_point
+    @points += 1
+  end
+
+  def self.add_to_symbols(symbol)
+    @@symbol_used << symbol
+  end
+
+  def self.symbols_used
+    @@symbol_used
+  end
+
 end
