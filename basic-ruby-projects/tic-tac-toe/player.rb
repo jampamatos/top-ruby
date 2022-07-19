@@ -21,6 +21,10 @@ class Player
     @points += 1
   end
 
+  def restart
+    @player_cells = []
+  end
+
   def self.add_to_symbols(symbol)
     @@symbol_used << symbol
   end

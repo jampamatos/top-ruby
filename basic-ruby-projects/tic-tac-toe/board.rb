@@ -16,6 +16,8 @@ class Board
                 [1, 4, 7], [2, 5, 8], [3, 6, 9],
                 [1, 5, 9], [3, 5, 7]]
     @taken_cells = []
+    @end_game = false
+
   end
 
   def print_board
@@ -44,7 +46,9 @@ class Board
   end
 
   def check_victory(player)
-    @victory.include? player.player_cells.sort
+    @victory.each { |combo| return true if (combo & player.player_cells).size == combo.size }
+    # Using Array Intersection in (combo & player.player_cells)
+    false
   end
 
   def check_draw
@@ -53,6 +57,28 @@ class Board
 
   def update_round
     @@round += 1
+  end
+
+  def start_game
+    @end_game = false
+    @cells = {
+      cell1: 1, cell2: 2, cell3: 3,
+      cell4: 4, cell5: 5, cell6: 6,
+      cell7: 7, cell8: 8, cell9: 9
+    }
+    @taken_cells = []
+  end
+
+  def end_game
+    @end_game = true
+  end
+
+  def game_end?
+    @end_game
+  end
+
+  def round_num
+    @@round
   end
 
   private
@@ -69,13 +95,5 @@ class Board
 
   def check_cell(num)
     @cells["cell#{num}".to_sym] == num
-  end
-
-  def clear_screen
-    if RUBY_PLATFORM =~ /win32|win64|\.NET|windows|cygwin|mingw32/i
-      system('cls')
-    else
-      system('clear')
-    end
   end
 end
