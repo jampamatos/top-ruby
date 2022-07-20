@@ -70,6 +70,15 @@
     - [Flow of Exception Handling](#flow-of-exception-handling)
     - [Exception and Error Classes](#exception-and-error-classes)
     - [Exception Error Tree](#exception-error-tree)
+  - [INPUT/OUTPUT](#inputoutput)
+    - [I/O in Ruby](#io-in-ruby)
+    - [The IO Class](#the-io-class)
+    - [Position](#position)
+    - [Sub-classes and Duck-types](#sub-classes-and-duck-types)
+      - [File](#file)
+      - [Sockets](#sockets)
+      - [StringIO](#stringio)
+      - [Tempfile](#tempfile)
 
 ## CONTROL FLOW
 
@@ -2163,3 +2172,258 @@ Exception
     SystemExit
     fatal 
 ```
+
+## INPUT/OUTPUT
+
+### I/O in Ruby
+
+- Input/Output, generally referred to as **I/O**, is a term that covers the ways that a computer interacts with the world.
+  - e.g. screens, keyboards, files, and networks.
+- Unix-like systems treat all external devices as files inside the `/dev` directory. Example [here](https://docstore.mik.ua/orelly/unix3/mac/appa_01.htm#mosxgeeks-APP-A-TABLE-6).
+
+```bash
+$ tree /dev
+/dev
+├── disk0
+├── fd
+│   ├── 0
+│   ├── 1
+│   ├── 2
+│   └── 3 [error opening dir]
+├── null
+├── stderr -> fd/2
+├── stdin -> fd/0
+├── stdout -> fd/1
+├── tty
+└── zero
+```
+
+- Files are a long stream of words/characters/bytes being read in from top to bottom.
+- I/O streams are located under the `/dev/fd` directory.
+- Files there are given a number, (file descriptor).
+- The operating system provides three streams by default. They are:
+  - Standard input (`/dev/fd/0`) - `stdin`
+  - Standard output (`/dev/fd/1`) - `stdout`
+  - Standard error (`/dev/fd/2`) - `sdterr`
+- `stdin` defaults to reading from the keyboard, `stdout` and `stderr` defaults to writing to the terminal
+- `/dev/stdout`, `/dev/stdin`, and `/dev/stderr` are just [symlinks](https://en.wikipedia.org/wiki/Symbolic_link) to the appropriate file descriptor.
+
+### The IO Class
+
+- Ruby `IO` objects wrap Input/Output streams.
+- The constants `STDIN`, `STDOUT`, and `STDERR` point to `IO` objects wrapping the standard streams.
+  - By default the global variables `$stdin`, `$stdout`, and `$stderr` point to their respective constants.
+- While the constants should always point to the default streams, *the globals can be overwritten to point to another I/O stream* such as a file.
+- `IO` objects can be written to via puts and print.
+
+```ruby
+$stdout.puts 'Hello World'
+# same as
+puts 'Hello World'
+```
+
+- The bare `puts` method is provided by Ruby’s `Kernel` module that is just an alias to `$stdout.puts`.
+- IO objects can be read from via `gets`, an alias to `$stdin.gets` provided by `Kernel`.
+- `$stdin` is read-only while `$stdout` and `$stderr` are write-only.
+
+```ruby
+$stdin.puts 'foo'
+# => IOError: not opened for writing
+$stdout.gets
+# => IOError: not opened for reading
+$stderr.gets
+# => IOError: not opened for reading
+```
+
+- To create a new IO object, we need a file descriptor.
+
+```ruby
+# in this case, file descriptor 1 for stdout:
+io = IO.new(1)
+# => #<IO:fd 1>
+io.puts 'hello world'
+# hello world
+# => nil
+```
+
+- To create IOs to other streams:
+
+```ruby
+fd = IO.sysopen('/dev/null', 'w+')
+# => 8
+dev_null = IO.new(fd)
+# => #<IO:fd 8>
+dev_null.puts 'hello'
+# => nil
+dev_null.gets
+# => nil
+dev_null.close
+#=> nil
+
+# /dev/null (sometimes referred to as the “bit bucket” or “black hole”) is the null device on Unix-like systems. Writing to it does nothing and attempting to read from it returns nothing (nil in Ruby)
+
+```
+
+- We get a file descriptor for a stream that is read/write to the `dev/null device`.
+- We create an IO object for this stream so we can interact with it in Ruby.
+- When writing to `dev_null`, the text no longer appears on the screen; when reading from `dev_null`, we get `nil`.
+
+### Position
+
+- When working with an `IO`, we have to keep position in mind. Given that we’ve opened a stream to the following file...
+
+```text
+Lorem ipsum
+dolor
+sit amet...
+```
+
+...and we call `gets` on it:
+
+```ruby
+IO.sysopen '/Users/joelquenneville/Desktop/lorem.txt'
+# => 8
+lorem = IO.new(8)
+# => #<IO:fd 8>
+lorem.gets
+# => "Lorem ipsum\n"
+```
+
+- It returns the first line of the file and moves the cursor to the next line. If we check the position of the cursor:
+
+```ruby
+lorem.pos
+#=> 12
+```
+
+- If we call `gets` a few more times:
+
+```ruby
+lorem.gets
+# => "dolor\n"
+lorem.gets
+# => "sit amet...\n"
+lorem.pos
+# => 30
+```
+
+- We can see Ruby’s “cursor” has moved. Now that we have read the whole file, what happens if we try to call gets?
+
+```ruby
+lorem.gets
+# => nil
+lorem.eof?
+# => true
+```
+
+- We see that it returns `nil`. We can ask a stream if we have reached “end of file” via `eof?`. To return to the beginning of the stream, we can call `rewind`.
+
+```ruby
+lorem.rewind
+# => 0
+lorem.pos
+# => 0
+```
+
+- This can lead to surprises when writing to a stream.
+
+```ruby
+fd = IO.sysopen '...somepath/test.txt', 'w+'
+# => 8
+io = IO.new(fd)
+# => #<IO:fd 8>
+io.puts 'hello world'
+# => nil
+io.puts 'goodbye world'
+# => nil
+```
+
+- This stream has the lines “hello world” and “goodbye world”. If we were to attempt to read:
+
+```ruby
+io.gets
+# => nil
+io.eof?
+# => true
+```
+
+- Our cursor is currently at the end of the file. In order to read we would need to first rewind.
+
+```ruby
+io.rewind
+# => 0
+io.gets
+# => "hello world\n"
+```
+
+- Any write operations in the middle of a stream will overwrite the existing data:
+
+```ruby
+io.pos
+# => 12
+io.puts "middle"
+# => nil
+io.rewind
+# => 0
+io.read
+# => "hello world\nmiddle\n world\n"
+```
+
+- This kind of behavior is necessary because streams do not get loaded into memory; only the lines being operated on are loaded.
+- This is very useful because some streams can point to very large files that would be expensive to load in memory all at once.
+- Streams can also be infinite.
+  - `$stdin` has no end; we can always read more data from it (when it receive the message `gets`, it waits for the user to type something).
+
+### Sub-classes and Duck-types
+
+Ruby gives us a couple subclasses of `IO` that are more specialized for a particular type of `IO`:
+
+#### [File](https://ruby-doc.org/core-2.1.2/File.html)
+
+- `File` allows us to read/write files without file descriptors.
+- Also adds file-specific convenience methods such as `File#size`, `File#chmod`, and `File.path`.
+
+#### Sockets
+
+- Sockets docs:
+  - [Socket](https://ruby-doc.org/stdlib-2.1.2/libdoc/socket/rdoc/Socket.html)
+  - [TCPSocket](https://ruby-doc.org/stdlib-2.1.2/libdoc/socket/rdoc/TCPSocket.html)
+  - [UDPSocket](https://ruby-doc.org/stdlib-2.1.2/libdoc/socket/rdoc/UDPSocket.html)
+  - [UNIXSocket](https://ruby-doc.org/stdlib-2.1.2/libdoc/socket/rdoc/UNIXSocket.html)
+- Ruby’s various socket classes inherit all ultimately inherit from `IO`.
+- For example, say we have a server running on `localhost:3000`
+
+```ruby
+require 'socket'
+# => true
+socket = TCPSocket.new 'localhost', 3000
+# => #<TCPSocket:fd 10>
+socket.puts 'GET "/"'
+# => nil
+socket.gets
+#=> "HTTP/1.1 400 Bad Request \r\n"
+```
+
+#### [StringIO](https://ruby-doc.org/stdlib-2.1.2/libdoc/stringio/rdoc/StringIO.html)
+
+- `StringIO` allows strings to behave like `IO`s.
+- Useful when we want to pass strings into systems that consume streams, like intests where we might inject a `StringIO` instead of reading an actual file.
+- Unlike previous classes showcased, `StringIO` does not inherit from `IO`.
+
+```ruby
+string_io = StringIO.new('hello world')
+# => #<StringIO:0x007feacb0cd4e8>
+string_io.gets
+# => "hello world"
+string_io.puts 'goodby world'
+# => nil
+string_io.rewind
+# => 0
+string_io.read
+# => "hello worldgoodby world\n"
+```
+
+#### [Tempfile](https://ruby-doc.org/stdlib-2.1.2/libdoc/tempfile/rdoc/Tempfile.html)
+
+- `Tempfile` is another class that doesn’t inherit from `IO`; instead, implements `File`‘s interface and deals with temporary files.
+- As such, it can be passed to any object that consumes `IO`-like objects.
