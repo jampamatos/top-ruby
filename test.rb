@@ -1,3 +1,4 @@
-# frozen_string_literal: true
-
-require './game_manager'
+fname = 'sample.txt'
+somefile = File.open(fname, 'w')
+somefile.puts 'hello file!'
+somefile.close

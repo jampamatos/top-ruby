@@ -79,6 +79,19 @@
       - [Sockets](#sockets)
       - [StringIO](#stringio)
       - [Tempfile](#tempfile)
+  - [READING FROM AND WRITING DIRECTLY TO FILES](#reading-from-and-writing-directly-to-files)
+    - [Writing to a File](#writing-to-a-file)
+    - [Reading from a file](#reading-from-a-file)
+      - [`readline` and `readlines`](#readline-and-readlines)
+    - [Closing files](#closing-files)
+    - [File existance and properties](#file-existance-and-properties)
+      - [`File.exists?`](#fileexists)
+      - [`Dir` class](#dir-class)
+  - [FILES AND SERIALIZATION](#files-and-serialization)
+    - [YAML](#yaml)
+    - [JSON](#json)
+    - [MessagePack](#messagepack)
+    - [Modularize with Mixins](#modularize-with-mixins)
 
 ## CONTROL FLOW
 
@@ -2179,6 +2192,8 @@ Exception
 
 - Input/Output, generally referred to as **I/O**, is a term that covers the ways that a computer interacts with the world.
   - e.g. screens, keyboards, files, and networks.
+- Input is any data that is read by the program, either from a keyboard, file or other programs.
+- Output is data that is produced by the program. The output may go to the screen, to a file or to another program.
 - Unix-like systems treat all external devices as files inside the `/dev` directory. Example [here](https://docstore.mik.ua/orelly/unix3/mac/appa_01.htm#mosxgeeks-APP-A-TABLE-6).
 
 ```bash
@@ -2427,3 +2442,458 @@ string_io.read
 
 - `Tempfile` is another class that doesn’t inherit from `IO`; instead, implements `File`‘s interface and deals with temporary files.
 - As such, it can be passed to any object that consumes `IO`-like objects.
+
+## READING FROM AND WRITING DIRECTLY TO FILES
+
+### Writing to a File
+
+- The File class supplies the basic methods to manipulate files.
+- The following script opens a new textfile in "write" mode and then writes "Hello file!" to it:
+
+```ruby
+fname = "sample.txt"
+somefile = File.open(fname, "w")
+somefile.puts "Hello file!"
+somefile.close
+```
+
+- the first line sets `fname` to just a string that represents the filename, not the actual file itself. This also works:
+
+```ruby
+somefile = File.open("sample.txt", "w")
+somefile.puts "Hello file!"
+somefile.close 
+```
+
+- The next line invokes the `File` class method open, which requires us to pass it two arguments:
+  1) the filename, represented by a String, and
+  2) the read/write mode. As you might guess, `"w"` stands for write.
+      - **Warning:** Using `"w"` mode on an existing file will **erase** the contents of that file. If you want to *append* to an existing file, use `"a"` as the second argument.
+  3) The `File` class has its own puts method. But this one prints to the file instead of to the screen.
+      - You can also use write, which does not include a newline character at the end of the string.
+  4) The `close` method finishes the writing process and prevents any further data operations on the file (though you can reopen it again).
+- **Block notation:**
+
+```ruby
+File.open("sample.txt", "w"){ |somefile| somefile.puts "Hello file!"}
+```
+
+- The file handle is automatically closed at the end of the block, so no need to call the close method.
+
+### Reading from a file
+
+- Reading a file uses the same `File.open` method as before. However, the second argument is an `"r"` instead of `"w"`.
+- After the file is opened, you can use a variety of methods to read its content. The most obviously-named method is `read`, which grabs all the file's contents:
+
+```ruby
+file = File.open("sample.txt", "r")
+contents = file.read
+puts contents   #=> Lorem ipsum etc.
+
+contents = file.read
+puts contents   #=> ""
+```
+
+- Every read operation begins where the last read operation ended. In the case where we've read the entire file (by not passing in a number), the second read call has nothing left to read.
+- Here's an example of read using the block format
+
+```ruby
+contents = File.open("sample.txt", "r"){ |file| file.read }
+puts contents
+#=>   Lorem ipsum etc.
+```
+
+#### `readline` and `readlines`
+
+- When dealing with delimited files, such as comma-delimited text files, it's more convenient to read the file line by line.
+- The `readlines` method can draw in all the content and automatically parse it as an array, splitting the file contents by the line breaks.
+
+```ruby
+File.open("sample.txt").readlines.each do |line|
+   puts line
+end
+```
+
+- The method `readline` on the other hand, reads a singular line.
+- Each read operation moves the file handle forward in the file.
+- If you keep calling readline until you hit the end of the file and then call it again, you'll get an "end of file" error.
+- The `File` class contains the `eof?` method, which returns true if there is no more data in the file to read.
+- The readline method is often used in conjunction with while or unless:
+
+```ruby
+file = File.open("sample.txt", 'r')
+while !file.eof?
+   line = file.readline
+   puts line
+end
+```
+
+- `readlines` load the entire file onto memory, while `readline` only operates on one line at once, which is more efficient.
+
+### Closing files
+
+- If you don't close a file, nothing too bad, usually happen.
+- But try writing a large amount of data to a file and have the program finish immediately after the write operation: you might notice that it appears to be incomplete.
+  - Re-open it a few seconds later and it should contain what you expect.
+- A file's `close` method forces a flush of the pending data, that is, it pushes the data-to-be-written to a file on the hard drive.
+- Doing a "flush" is good practice in programming because it frees up memory for the rest of your program and ensures that that file is available for other processes to access.
+
+```ruby
+datafile = File.open("sample.txt", "r")
+lines = datafile.readlines         
+datafile.close
+
+lines.each{ |line| puts line }  
+```
+
+- Or, you can pass a block into File.open. At the end of the block, the file is automatically closed:
+
+```ruby
+lines = File.open("sample.txt", "r"){ |datafile| 
+   datafile.readlines }
+
+lines.each{ |line| puts line }
+```
+
+### File existance and properties
+
+#### `File.exists?`
+
+- This is a useful class method that checks whether a file or directory exists and returns true/false:
+
+```ruby
+if File.exists?(filename)
+   puts "#{filename} exists"
+end
+```
+
+```ruby
+dirname = "data-files"
+Dir.mkdir(dirname) unless File.exists?dirname
+File.open("#{dirname}/new-file.txt", 'w'){ |f| f.write('Hello world!') }
+```
+
+#### `Dir` class
+
+```ruby
+#  Dir.glob takes in a directory name and/or a pattern with wildcards and returns an array of filenames
+
+# count the files in my Downloads directory:
+puts Dir.glob('Downloads/*').length   #=> 382
+
+# count all files in my Downloads directory and in sub-directories
+puts Dir.glob('Downloads/**/*').length   #=> 308858
+
+# list just PDF files, either with .pdf or .PDF extensions:
+puts Dir.glob('Downloads/*.{pdf,PDF}').join(",\n")
+
+#=> Downloads/About Downloads.pdf,
+#=> Downloads/blueprintcss-1-0-cheatsheet-4-2-gjms.pdf,
+#=> Downloads/crafting-rails-applications_b3_0.pdf,
+#=> Downloads/DOM166.pdf,
+#=> Downloads/html5-cheat-sheet.pdf,
+#=> Downloads/la_museum_free_days.pdf,
+#=> Downloads/mbapm_rec-a.pdf,
+#=> Downloads/mbapm_rec.pdf,
+#=> Downloads/metaprogramming-ruby_p2_0.pdf,
+#=> Downloads/mining-of-massive-datasets-book.pdf,
+#=> Downloads/poignant-guide.pdf,
+#=> Downloads/PrinterSchedule.pdf      
+```
+
+## FILES AND SERIALIZATION
+
+- Serialization takes a Ruby object and converts it into a string of bytes and vice versa
+  - an object representing some data tructure has to be serialized into a set of bytes that can be pushed over a socket to be sent over a network
+  - at the other end, the receiver has to unserialize the object, converting it back into something that Ruby (or another language) can understand.
+- Lots of ways to serialize, most known are YAML and JSON
+
+### YAML
+
+- YAML is a recursive acronym that stands for *“YAML Ain’t Markup Language”*.
+- It is a serialization format, but it is also (easily) human readable, meaning that it can be used as a configuration language.
+
+```YAML
+name: "David"
+height: 124
+age: 28
+children:
+  "John":
+    age: 1
+    height: 10
+  "Adam":
+    age: 2
+    height: 20
+  "Robert":
+    age: 3
+    height: 30
+traits:
+  - smart
+  - nice
+  - caring
+```
+
+- To transform YAML into a Ruby hash:
+
+```ruby
+require 'yaml'
+
+YAML.load File.read('test.yaml')
+
+# {"name"=>"David",
+#  "height"=>124,
+#  "age"=>28,
+#  "children"=>{"John"=>{"age"=>1, "height"=>10},
+#              "Adam"=>{"age"=>2, "height"=>20},
+#              "Robert"=>{"age"=>3, "height"=>30}},
+#  "traits"=>["smart", "nice", "caring"]}
+```
+
+- In YAML:
+  - colons represent “key-value” pairings
+  - tabs create a new hash.
+  - hyphens builds a list rather than a hash.
+- This easy translation between YAML and Ruby dictionaries is one of the primary benefits of YAML.
+
+```ruby
+require 'yaml'
+
+class Person
+  attr_accessor :name, :age, :gender
+
+  def initialize(name, age, gender)
+    @name = name
+    @age = age
+    @gender = gender
+  end
+
+  def to_yaml
+    YAML.dump ({
+      :name => @name,
+      :age => @age,
+      :gender => @gender
+    })
+  end
+
+  def self.from_yaml(string)
+    data = YAML.load string
+    p data
+    self.new(data[:name], data[:age], data[:gender])
+  end
+end
+
+p = Person.new "David", 28, "male"
+p p.to_yaml
+
+p = Person.from_yaml(p.to_yaml)
+puts "Name #{p.name}"
+puts "Age #{p.age}"
+puts "Gender #{p.gender}"
+```
+
+### JSON
+
+- JSON stands for *Javascript Object Notation*
+- its syntax is nearly the same as the syntax for defining Javascript objects
+
+```json
+{
+  "name": "David",
+  "height": 124,
+  "age": 28,
+  "children": {"John": {"age": 1, "height": 10},
+             "Adam": {"age": 2, "height": 20},
+             "Robert": {"age": 3, "height": 30}},
+  "traits": ["smart", "nice", "caring"]
+}
+```
+
+```ruby
+require 'json'
+JSON.load File.read("test.json")
+
+# {"name"=>"David",
+#  "height"=>124,
+#  "age"=>28,
+#  "children"=>{"John"=>{"age"=>1, "height"=>10},
+#              "Adam"=>{"age"=>2, "height"=>20},
+#              "Robert"=>{"age"=>3, "height"=>30}},
+#  "traits"=>["smart", "nice", "caring"]}
+```
+
+```ruby
+require 'json'
+
+class Person
+  ...
+  def to_json
+    JSON.dump ({
+      :name => @name,
+      :age => @age,
+      :gender => @gender
+    })
+  end
+
+  def self.from_json(string)
+    data = JSON.load string
+    self.new(data['name'], data['age'], data['gender'])
+  end
+  ...
+end
+```
+
+- Many modern browsers have a Javascript implementation of JSON by default, making it the lingua franca of AJAX communication.
+- On the other hand, YAML requires an extra library and simply does not have that much following in the Javascript community.
+- If your primary objective for a serialization method is to communicate with Javascript, look at JSON first.
+
+### MessagePack
+
+- With YAML and JSON, how much space a serialized object consumes is not an issue.
+- Turns out that small serialized size is a very important characteristic, especially for systems that require low latency and high throughput. This is where MessagePack steps in.
+- MessagePack is not meant to be human readable:
+  - it is a binary format, which means that it represents its information as arbitrary bytes, not necessarily bytes that represent the alphabet.
+  - its serializations often take up significantly less space than their YAML and JSON counterparts.
+- Because MessagePack does not come bundled with Ruby, it has to be installed
+
+```bash
+gem install msgpack
+```
+
+```ruby
+require 'msgpack'
+msg = {:height => 47, :width => 32, :depth => 16}.to_msgpack
+p msg
+#=>  "\x83\xA6height/\xA5width \xA5depth\x10"
+
+obj = MessagePack.unpack(msg)
+p obj
+# => {"height"=>47, "width"=>32, "depth"=>16}
+```
+
+```ruby
+class Person
+  ...
+  def to_msgpack
+    MessagePack.dump ({
+      :name => @name,
+      :age => @age,
+      :gender => @gender
+    })
+  end
+
+  def self.from_msgpack(string)
+    data = MessagePack.load string
+    self.new(data['name'], data['age'], data['gender'])
+  end
+  ...
+end
+```
+
+### Modularize with Mixins
+
+- Ruby is a dynamic language with some great metaprogramming features.
+- Notice that the `Person` serialization/unserialization methods created earlier are smilar.
+
+```ruby
+require 'json'
+
+#mixin
+module BasicSerializable
+
+  #should point to a class; change to a different
+  #class (e.g. MessagePack, JSON, YAML) to get a different
+  #serialization
+  @@serializer = JSON
+
+  def serialize
+    obj = {}
+    instance_variables.map do |var|
+      obj[var] = instance_variable_get(var)
+    end
+
+    @@serializer.dump obj
+  end
+
+  def unserialize(string)
+    obj = @@serializer.parse(string)
+    obj.keys.each do |key|
+      instance_variable_set(key, obj[key])
+    end
+  end
+end
+```
+
+- In the `serialize` method:
+  - the `@@serializer` class variable is set to the serializing class. This means that we can immediately change our serialization method, as long as our serializable classes include this module.
+  - the `serialize` method loops over the `instance_variables` and constructs a Ruby hash of the variable names and their values.
+  - Then, simply use the `@@serializer` to dump out the object.
+  - If the serializing mechanism does not have a dump method, we can simply subclass it to give it that method
+- similar approach with the `unserialize` method:
+  - use the serializer to get a Ruby hash out of the string and set the object’s instance variables to the values of the hash.
+- This makes our Person class really easy to implement:
+
+```ruby
+class Person
+include BasicSerializable
+
+  attr_accessor :name, :age, :gender
+
+  def initialize(name, age, gender)
+    @name = name
+    @age = age
+    @gender = gender
+  end
+end
+```
+
+```ruby
+p = Person.new "David", 28, "male"
+p p.serialize
+# "{\"@name\":\"David\",\"@age\":28,\"@gender\":\"male\"}"
+
+p.unserialize (p.serialize)
+puts "Name #{p.name}"
+# Name David
+puts "Age #{p.age}"
+# Age 28
+puts "Gender #{p.gender}"
+# Gender male
+```
+
+- you might notice that the `BasicSerializable` methods work very well for objects that only have serializable instance variables (i.e. integers, strings, floats, etc. or arrays and hashes of them).
+- However, it will fail for an object that has other BasicSerializable objects as instances.
+- The easy wasy to fix this problem is to **override** the serialize and unserialize methods in such classes, like so:
+
+```ruby
+class People
+  include BasicSerializable
+
+  attr_accessor :persons
+
+  def initialize
+    @persons = []
+  end
+
+  def serialize
+    obj = @persons.map do |person|
+      person.serialize
+    end
+
+    @@serializer.dump obj
+  end
+
+  def unserialize(string)
+    obj = @@serializer.parse string
+    @persons = []
+    obj.each do |person_string|
+      person = Person.new "", 0, ""
+      person.unserialize(person_string)
+      @persons << person
+    end
+  end
+
+  def <<(person)
+    @persons << person
+  end
+end
+```
