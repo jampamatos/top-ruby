@@ -97,14 +97,12 @@ def end_turn(game)
   else
     you_lost_msg
   end
-  puts "The word I was thinking of is #{game.word.join.upcase}"
+  puts "The word I was thinking of is #{game.word.upcase}"
   puts ''
 end
 
-## TRY TO SERIALIZE INTO MESSAGEPACK
-
 def save_game(game)
-  save_game = Marshal.dump(game)
+  save_game = game.to_yaml
   savename = save_msg
   File.open("../saves/#{savename}", 'w') { |file| file.puts save_game }
 end
@@ -114,5 +112,5 @@ def load_game
   return load_file if load_file == '.'
 
   serialized = File.read("../saves/#{load_file}")
-  Marshal.load(serialized)
+  Game.from_yaml(serialized)
 end
