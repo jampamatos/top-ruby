@@ -1,5 +1,34 @@
 # frozen_string_literal: true
 
-require './game_manager'
+require './lib/game_manager'
 
+wordlist = load_words
 
+loop do
+  choice = welcome_msg
+  if choice == 'l'
+    puts 'load game logic'
+    exit 0
+  else
+    game = new_game(wordlist)
+  end
+
+  while game.tries.positive?
+    break if game.all_correct_letters?
+
+    letter = play_round(game)
+    next if game.guessed_letters.include?(letter)
+
+    if game.word.include?(letter)
+      good_guess_msg(game, letter)
+      next
+    else
+      incorrect_msg(game, letter)
+    end
+  end
+
+  end_turn(game)
+
+  again = play_again_msg
+  quit_msg unless again == 'y'
+end
