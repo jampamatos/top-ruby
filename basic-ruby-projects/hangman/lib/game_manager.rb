@@ -2,6 +2,8 @@
 
 require './lib/game'
 require './lib/messages'
+# require './game'
+# require './messages'
 
 WORDLIST_FILE = 'google-10000-english-no-swears.txt'
 Dir.chdir(File.dirname(__FILE__)) # File in the same directory
@@ -72,7 +74,8 @@ def play_round(game)
   input = round_input
   case input
   when 'save'
-    save_msg
+    save_game(game)
+    exit 0
   when 'quit'
     quit_msg
   else
@@ -96,4 +99,20 @@ def end_turn(game)
   end
   puts "The word I was thinking of is #{game.word.join.upcase}"
   puts ''
+end
+
+## TRY TO SERIALIZE INTO MESSAGEPACK
+
+def save_game(game)
+  save_game = Marshal.dump(game)
+  savename = save_msg
+  File.open("../saves/#{savename}", 'w') { |file| file.puts save_game }
+end
+
+def load_game
+  load_file = load_msg
+  return load_file if load_file == '.'
+
+  serialized = File.read("../saves/#{load_file}")
+  Marshal.load(serialized)
 end

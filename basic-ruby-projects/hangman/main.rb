@@ -7,8 +7,8 @@ wordlist = load_words
 loop do
   choice = welcome_msg
   if choice == 'l'
-    puts 'load game logic'
-    exit 0
+    game = load_game
+    next if game == '.'
   else
     game = new_game(wordlist)
   end

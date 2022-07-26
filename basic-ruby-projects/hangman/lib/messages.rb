@@ -30,8 +30,49 @@ def round_start_msg(game)
 end
 
 def save_msg
-  puts 'save game logic here'
-  exit 0
+  begin
+    clear_screen
+    puts Dir.entries('../saves')
+    puts 'Please enter a save file name:'
+    input = gets.chomp
+    raise TypeError if /(\.\w+)/.match(input)
+    raise NameError if Dir.entries('../saves').include?(input)
+  rescue TypeError
+    puts 'Please, do not add extention to your save file name.'
+    sleep(2)
+    retry
+  rescue NameError
+    puts 'File name exists. Overwrite? (Y/N)'
+    over = gets.downcase.chomp
+    case over
+    when 'y'
+      puts "Game saved as '#{input}'"
+      return input
+    when 'n'
+      retry
+    else
+      puts 'Wrong input.'
+      retry
+    end
+  end
+  puts ''
+  puts "Game saved as '#{input}'"
+  input
+end
+
+def load_msg
+  begin
+    clear_screen
+    puts Dir.entries('../saves')
+    puts 'Please enter a file name to load or "." to cancel:'
+    input = gets.chomp
+    raise NameError unless Dir.entries('../saves').include?(input) || input == '.'
+  rescue NameError
+    puts "File #{input} does not exist."
+    sleep(2)
+    retry
+  end
+  input
 end
 
 def quit_msg
