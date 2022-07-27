@@ -49,11 +49,11 @@ class Game
 
   def to_yaml
     YAML.dump({
-                       word: @word,
-                       guessed_letters: @guessed_letters,
-                       available_letters: @available_letters,
-                       tries: @tries
-    })
+                word: @word,
+                guessed_letters: @guessed_letters,
+                available_letters: @available_letters,
+                tries: @tries
+              })
   end
 
   def self.from_yaml(string)
