@@ -92,6 +92,18 @@
     - [JSON](#json)
     - [MessagePack](#messagepack)
     - [Modularize with Mixins](#modularize-with-mixins)
+  - [BLOCKS](#blocks)
+    - [`yield`](#yield)
+    - [Block control](#block-control)
+    - [Lambdas](#lambdas)
+    - [Procs](#procs)
+    - [Procs vs Lambdas: Differences](#procs-vs-lambdas-differences)
+      - [Arguments](#arguments)
+      - [Returning](#returning)
+    - [Procs vs Lambdas: Similarities](#procs-vs-lambdas-similarities)
+      - [Default Arguments](#default-arguments)
+      - [Method parameters](#method-parameters)
+    - [Capturin blocks](#capturin-blocks)
 
 ## CONTROL FLOW
 
@@ -2154,7 +2166,7 @@ end
 
 ### Exception Error Tree
 
-```kernel
+```bash
 Exception
     NoMemoryError
     ScriptError
@@ -2896,4 +2908,390 @@ class People
     @persons << person
   end
 end
+```
+
+## BLOCKS
+
+- A block can be declared as a single-line or multi-line block.
+- Ruby convention is to use `{}` for single-line blocks and `do..end` for multi-line blocks.
+- Parameters are passed to a block by defining them inside pipes, i.e. `|arg1, arg2|`.
+
+```ruby
+# Single-line block
+[1,2,3].each { |num| puts num }
+
+# Multi-line block
+[1,2,3].each do |num|
+  puts num
+end
+```
+
+### `yield`
+
+- yield is a keyword that can be called inside a method to relinquish execution to the accompanying block.
+
+```ruby
+def logger
+  yield
+end
+
+logger { puts 'hello from the block' }
+#=> hello from the block
+
+logger do
+  p [1,2,3]
+end
+#=> [1,2,3]
+```
+
+```ruby
+def double_vision
+  yield
+  yield
+end
+
+double_vision { puts "How many fingers am I holding up?" }
+#=> How many fingers am I holding up?
+#=> How many fingers am I holding up?
+```
+
+- Arguments passed to `yield` will be passed as parameters to the block.
+  - If `yield` is called multiple times, different arguments will be passed.
+
+```ruby
+def love_language
+  yield('Ruby')
+  yield('Rails')
+end
+
+love_language { |lang| puts "I love #{lang}" }
+#=> I love Ruby.
+#=> I love Rails.
+```
+
+- Example:
+  - We write a method that iterates through a list of transactions, and for each one yields it to a block.
+  - The caller of the method can call it with any block they want.
+  - This way, they can define how the transactions will be printed.
+
+```ruby
+@transactions = [10, -15, 25, 30, -24, -70, 999]
+
+def transaction_statement
+  @transactions.each do |transaction|
+    yield transaction # You just yield the transaction amount.
+  end
+end
+
+transaction_statement do |transaction|
+  p "%0.2f" % transaction # The caller can define how it is handled.
+end
+#=> ["10.00", "-15.00", "25.00", "30.00", "-24.00", "-70.00", "999.00"]
+```
+
+- Instead we didn’t want the caller to define how the transaction is printed, but just the format:
+
+```ruby
+@transactions = [10, -15, 25, 30, -24, -70, 999]
+
+def transaction_statement
+  @transactions.each do |transaction|
+    p yield transaction # `p` is called within our method now instead of within the block
+  end
+end
+
+transaction_statement do |transaction|
+  "%0.2f" % transaction
+end
+#=> ["10.00", "-15.00", "25.00", "30.00", "-24.00", "-70.00", "999.00"]
+```
+
+- If we want to gather the value returned from the block, we can just assign it to a variable or collect it in a data structure:
+
+```ruby
+@transactions = [10, -15, 25, 30, -24, -70, 999]
+
+def transaction_statement
+  formatted_transactions = []
+  @transactions.each do |transaction|
+    formatted_transactions << yield(transaction)
+  end
+
+  p formatted_transactions
+end
+
+transaction_statement do |transaction|
+  "%0.2f" % transaction
+end
+#=> ["10.00", "-15.00", "25.00", "30.00", "-24.00", "-70.00", "999.00"]
+```
+
+- In the above examples, the value that we `yield` to the block in transaction_statement is captured by the block and assigned to the named parameter ; if we don’t pass a value with `yield` and the block expects one, then the argument is assigned `nil`
+
+```ruby
+def say_something
+  yield # No arguments are passed to yield
+end
+
+say_something do |word| # But the block expects one argument to be passed in
+  puts "And then I said: #{word}"
+end
+#=> And then I said:
+```
+
+- If you have two parameters but pass 3 arguments, then the last one is not assigned to a parameter and you can’t reference it in the block
+
+```ruby
+def mad_libs
+  yield('cool', 'beans', 'burrito') # 3 arguments are passed to yield
+end
+
+mad_libs do |adjective, noun| # But the block only takes 2 parameters
+  puts "I said #{adjective} #{noun}!"
+end
+#=> I said cool beans!
+```
+
+- If you’re working with hashes you might need to yield the key and value, just make sure your block names two parameters
+
+```ruby
+def awesome_method
+  hash = {a: 'apple', b: 'banana', c: 'cookie'}
+
+  hash.each do |key, value|
+    yield key, value
+  end
+end
+
+awesome_method { |key, value| puts "#{key}: #{value}" }
+#=> a: apple
+#=> b: banana
+#=> c: cookie
+```
+
+### Block control
+
+- If `yield` is called without a block, ruby will throw a `LocalJumpError`
+
+```ruby
+def simple_method
+  yield
+end
+
+simple_method
+# => `simple_method': no block given (yield) (LocalJumpError)
+```
+
+- `block_given?` method can be used as a conditional inside a function to check if a block is passed
+
+```ruby
+def maybe_block
+  if block_given?
+    puts "block party"
+  end
+  puts "executed regardless"
+end
+
+maybe_block
+# => executed regardless
+
+maybe_block {} # {} is just an empty block
+# => block party
+# => executed regardless
+```
+
+- `#count` is a method that can be called with or without a block.
+  - If called without an argument, it just returns the size of whatever it was called on.
+  - When called with an argument, it counts how many times that argument appears in the object it was called on.
+  - And with a block, it yields to the block and provides a count of how many times the block returns a truthy response.
+
+### Lambdas
+
+- A `lambda` is a way to write a block and save it to a variable.
+- This can be useful if you’re calling different methods but passing in the same block to each of them.
+- There are two ways to create a lambda.
+  - One is to use the lambda keyword e.g. `lambda { "inside the lambda" }`
+  - The other way to declare a lambda is using the “stabby lambda” syntax, `-> {}`
+- To call a lambda you just call the `#call` method.
+
+```ruby
+my_lambda = lambda { puts "my lambda" }
+my_other_lambda = -> { puts "hello from the other side" }
+
+my_lambda.call
+# => my lambda
+```
+
+- To accept arguments into a lambda:
+  - For the stabby lambda syntax `->` then use `()` to name your parameters.
+  - For the lambda keyword, then use pipes `||` inside the block.
+
+```ruby
+my_name = ->(name) { puts "hello #{name}" }
+
+my_age = lambda { |age| puts "I am #{age} years old" }
+
+
+my_name.call("tim")
+#=> hello tim
+my_age.call(78)
+#=> I am 78 years old
+```
+
+### Procs
+
+- A proc is an object that you can use to store blocks and pass them around like variables, just like a lambda
+- There is no special lambda class; a lambda is actually just a type of proc object but with some distinct behaviors.
+- You declare a new proc in the same way you instantiate any object in Ruby, using `new`, or you can just use ‘proc’
+
+```ruby
+a_proc = Proc.new { puts "this is a proc" }
+
+a_proc.call
+#=> this is a proc
+
+b_proc = proc { puts "this is also a proc" }
+
+b_proc.call
+#=> this is also a proc
+```
+
+- Arguments are declared inside pipes `||`
+
+```ruby
+a_proc = Proc.new { |name, age| puts "name: #{name} --- age: #{age}" }
+
+a_proc.call("tim", 80)
+#=> name: tim --- age: 80
+```
+
+### Procs vs Lambdas: Differences
+
+- There are some key differences between procs and lambdas that can make choosing one over the other more suitable.
+
+#### Arguments
+
+- A proc behaves much like a block with regards to arguments as in it doesn’t care if more or fewer arguments are passed than specified.
+- It will also assign `nil` to any parameters that are named but not passed through as arguments.
+
+```ruby
+a_proc = Proc.new { |a, b| puts "a: #{a} --- b: #{b}" }
+
+a_proc.call("apple")
+# => a: apple --- b:
+```
+
+- Now, with the `#select` method:
+
+```ruby
+nested_array = [[1, 2], [3, 4], [5, 6]]
+nested_array.select {|a, b| a + b > 10 }
+
+# => [5, 6]
+```
+
+- `#select` has two arguments specified `|a, b|`
+- Each iteration we pass a single element of nested_array into the block:
+  - On the first iteration this is: `[1, 2]`, which is now is deconstructed automatically (into `a = 1, b = 2`) and its values compared as specified.
+  - So on to the next rounds of iteration in which we pass `[3, 4]` and `[5, 6]` one by one.
+  - This happens because the block `{|a, b| if a + b > 10 }` is treated as a **non-lambda proc**.
+- This property is not limited to `#select` but also applies to other `enum` methods like `#map`, `#each` etc.
+- More about this here on the [documentation](https://ruby-doc.org/core-3.1.2/Proc.html).
+- A `lambda`, on the other hand, DOES care and will raise an error if you don’t honor the number of parameters expected.
+
+```ruby
+a_proc = lambda { |a, b| puts "a: #{a} --- b: #{b}" }
+
+a_proc.call("apple")
+# => wrong number of Arguments (given 1, expected 2) (ArgumentError)
+
+a_proc.call("apple", "banana", "cake")
+# => wrong number of Arguments (given 3, expected 2) (ArgumentError)
+```
+
+#### Returning
+
+- When you write an explicit return inside a lambda, it returns from the lambda block back to the caller.
+
+```ruby
+a_lambda = -> { return 1 }
+
+a_lambda.call
+# => 1
+```
+
+- A `proc` object, however, returns from the context in which it is called.
+- If you are in the top level context (outside of a class or method), then you’ll get an error because you can’t return out of the very top level context, as there is no caller to return to.
+
+```ruby
+a_proc = Proc.new { return }
+
+a_proc.call
+# => localJumpError (unexpected return)
+```
+
+- If you return from a proc inside a method, the method is the context in which it was called and therefore it returns from the method before any of the other code below it is executed.
+
+```ruby
+def my_method
+  a_proc = Proc.new { return }
+  puts "this line will be printed"
+  a_proc.call
+  puts "this line is never reached"
+end
+
+my_method
+#=> this line will be printed
+```
+
+### Procs vs Lambdas: Similarities
+
+#### Default Arguments
+
+- Both procs and lambdas support default arguments in the same way Ruby methods do:
+
+```ruby
+my_proc = Proc.new { |name="bob"| puts name }
+
+my_proc.call
+# => bob
+
+my_lambda = ->(name="r2d2") { puts name }
+
+my_lambda.call
+# => r2d2
+```
+
+#### Method parameters
+
+- Both procs and lambdas can be used as arguments to a method.
+
+```ruby
+def my_method(useful_arg)
+  useful_arg.call
+end
+
+my_lambda = -> { puts "lambda" }
+my_proc = Proc.new { puts "proc" }
+
+my_method(my_lambda)
+# => lambda
+
+my_method(my_proc)
+# => proc
+```
+
+### Capturin blocks
+
+- Now that we know how procs and lambdas work, how can this be applied to blocks?
+- As we learned, blocks are like little anonymous methods; but what if we want to capture a reference to that block to do something with it?
+- Maybe we need to receive the block now in our method and store it in an instance variable to be called later.
+- Ruby allows us to capture blocks in a method definition as a special argument using `&`.
+
+```ruby
+def cool_method(&my_block)
+  my_block.call
+end
+
+cool_method { puts "cool" }
 ```
