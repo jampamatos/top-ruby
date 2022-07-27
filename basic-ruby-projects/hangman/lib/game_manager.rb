@@ -36,9 +36,9 @@ end
 def start_input
   begin
     input = gets.downcase.chomp
-    raise TypeError unless %w[l n].include?(input)
+    raise TypeError unless %w[l n e].include?(input)
   rescue TypeError
-    puts "Please, type 'L' to load a game or 'N' to start a new one:"
+    puts "Please, type 'L' to load a game, 'N' to start a new one, 'E' to exit:"
     retry
   end
   puts ''
@@ -93,9 +93,9 @@ end
 
 def end_turn(game)
   if game.all_correct_letters?
-    you_win_msg
+    you_win_msg(game)
   else
-    you_lost_msg
+    you_lost_msg(game)
   end
   puts "The word I was thinking of is #{game.word.upcase}"
   puts ''
@@ -109,7 +109,7 @@ end
 
 def load_game
   load_file = load_msg
-  return load_file if load_file == '.'
+  return load_file if ['.', '..'].include? load_file
 
   serialized = File.read("../saves/#{load_file}")
   Game.from_yaml(serialized)

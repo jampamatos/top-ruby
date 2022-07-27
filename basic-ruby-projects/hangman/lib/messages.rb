@@ -1,10 +1,117 @@
 # frozen_string_literal: true
 
+HANGMAN = [
+  "
+
+
+
+
+
+
+
+  ",
+  "
+
+
+
+
+
+
+=========
+  ",
+  "
+  +---+
+  |   |
+      |
+      |
+      |
+      |
+=========
+  ",
+  "
+  +---+
+  |   |
+  O   |
+      |
+      |
+      |
+=========
+  ",
+  "
+  +---+
+  |   |
+  O   |
+  |   |
+      |
+      |
+=========
+  ",
+  "
+  +---+
+  |   |
+  O   |
+ /|   |
+      |
+      |
+=========
+  ",
+  "
+  +---+
+  |   |
+  O   |
+ /|\\  |
+      |
+      |
+=========
+  ",
+  "
+  +---+
+  |   |
+  O   |
+ /|\\  |
+ /    |
+      |
+=========
+  ",
+  "
+  +---+
+  |   |
+  O   |
+ /|\\  |
+ / \\  |
+      |
+=========
+  "
+].freeze
+
+def show_hangman(game)
+  case game.tries
+  when 8
+    puts HANGMAN[0]
+  when 7
+    puts HANGMAN[1]
+  when 6
+    puts HANGMAN[2]
+  when 5
+    puts HANGMAN[3]
+  when 4
+    puts HANGMAN[4]
+  when 3
+    puts HANGMAN[5]
+  when 2
+    puts HANGMAN[6]
+  when 1
+    puts HANGMAN[7]
+  when 0
+    puts HANGMAN[8]
+  end
+end
+
 def welcome_msg
   clear_screen
   puts 'Welcome to Ruby Hangman!'
   puts ''
-  puts "Please type 'L' to load a game or 'N' to start a new one:"
+  puts "Please type 'L' to load a game , 'N' to start a new one, or 'E' to exit:"
   start_input
 end
 
@@ -24,6 +131,7 @@ end
 
 def round_start_msg(game)
   puts "Chances left: #{game.tries}"
+  show_hangman(game)
   available_letters_msg(game)
   game.show_word
   puts "Type 'save' to SAVE AND EXIT game, QUIT to quit or any letter to TRY A GUESS:"
@@ -66,9 +174,9 @@ def load_msg
     puts Dir.entries('../saves')
     puts 'Please enter a file name to load or "." to cancel:'
     input = gets.chomp
-    raise NameError unless Dir.entries('../saves').include?(input) || input == '.'
+    raise NameError unless Dir.entries('../saves').include?(input) || input == '.' || input == '..'
   rescue NameError
-    puts "File #{input} does not exist."
+    puts "File '#{input}' does not exist."
     sleep(2)
     retry
   end
@@ -98,12 +206,14 @@ def incorrect_msg(game, letter)
   game.minus_tries
 end
 
-def you_win_msg
+def you_win_msg(game)
   clear_screen
+  show_hangman(game)
   puts 'Congratulations! You won!'
 end
 
-def you_lost_msg
+def you_lost_msg(game)
   clear_screen
+  show_hangman(game)
   puts 'Sorry, You lost!'
 end

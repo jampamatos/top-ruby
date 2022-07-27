@@ -6,9 +6,12 @@ wordlist = load_words
 
 loop do
   choice = welcome_msg
-  if choice == 'l'
+  case choice
+  when 'l'
     game = load_game
-    next if game == '.'
+    next if ['.', '..'].include? game
+  when 'e'
+    quit_msg
   else
     game = new_game(wordlist)
   end
