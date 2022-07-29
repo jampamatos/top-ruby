@@ -103,7 +103,12 @@
     - [Procs vs Lambdas: Similarities](#procs-vs-lambdas-similarities)
       - [Default Arguments](#default-arguments)
       - [Method parameters](#method-parameters)
-    - [Capturin blocks](#capturin-blocks)
+    - [Capturing blocks](#capturing-blocks)
+    - [Examples](#examples)
+  - [PATTERN MATCH](#pattern-match)
+    - [Patterns](#patterns)
+    - [Return values](#return-values)
+    - [Object Pattern Match](#object-pattern-match)
 
 ## CONTROL FLOW
 
@@ -3281,12 +3286,12 @@ my_method(my_proc)
 # => proc
 ```
 
-### Capturin blocks
+### Capturing blocks
 
 - Now that we know how procs and lambdas work, how can this be applied to blocks?
 - As we learned, blocks are like little anonymous methods; but what if we want to capture a reference to that block to do something with it?
 - Maybe we need to receive the block now in our method and store it in an instance variable to be called later.
-- Ruby allows us to capture blocks in a method definition as a special argument using `&`.
+- Ruby allows us to capture blocks in a method definition as a special argument using `&`. (if a method names some other parameters, the block-capturing `&` parameter should always go last.)
 
 ```ruby
 def cool_method(&my_block)
@@ -3294,4 +3299,254 @@ def cool_method(&my_block)
 end
 
 cool_method { puts "cool" }
+```
+
+- When `&` is used, Ruby calls a method called `#to_proc` on whatever is assigned to that variable.
+- In the example above, using `&` assigns the block to `my_block` and then calls `#to_proc` on it, which creates a proc object. That is why you can use `#call` on it.
+- If you put `&` in front of a `Proc` instance in the argument position, that will be interpreted as a block.
+- If you combine something other than a `Proc` instance with `&`, then implicit class casting will try to convert that to a `Proc` instance using `to_proc` method defined on that object if there is any.
+- In case of a `Symbol` instance, to_proc works in this way:
+
+```ruby
+:foo.to_proc # => ->x{x.foo}
+```
+
+- For example:
+
+```ruby
+bar(&:foo)
+# The & operator is combined with :foo, which is not a Proc instance, so implicit class cast applies Symbol#to_proc to it, which gives ->x{x.foo}. The & now applies to this and is interpreted as a block, which gives:
+
+bar { |x| x.foo }
+
+```
+
+```ruby
+arr = ["1", "2", "3"]
+
+arr.map(&:to_i)
+# => [1, 2, 3]
+```
+
+- `#to_proc` is called on the symbol `:to_i`. and returns a proc object which responds to the given method indicated by the symbol.
+- So here, `#map` yields each value in the array to the proc object, which calls `#to_i` on it.
+
+- The `&` also works the other way. You can append it to a proc object and it converts it to a block, and passes the block to the method being called.
+
+```ruby
+def cool_method
+  yield
+end
+
+my_proc = Proc.new { puts "proc party" }
+
+cool_method(&my_proc)
+# => proc party
+```
+
+- If you tried to call `cool_method(my_proc)` without the `&` you’d get an error because the method expected no arguments but you supplied one.
+- Similarly, if you have a method that names a parameter and you try to call it with a proc converted to a block, you’ll get an error
+
+```ruby
+def cool_method(an_arg)
+  an_arg.call
+end
+
+a_proc = Proc.new { puts "procodile hunter" }
+
+cool_method(&a_proc) # Converting the proc object to a block
+
+# => ArgumentError (wrong number of arguments (given 0, expected 1))
+```
+
+- Using `&` on a proc when calling a method converts it to a block before passing it to the method. It is no longer a named argument to the method.
+
+### Examples
+
+- Timing an execution:
+
+```ruby
+def time
+  start = Time.now
+  yield
+  Time.now - start
+end
+
+p (time { 'a' * 1000000000 }) # => 0.3582474
+```
+
+- Running a block into a function both implicitly and explicitly:
+
+**IMPLICITLY:**
+
+```ruby
+students = ['Greyson', 'Logan', 'Steve', 'Tony']
+
+def implicit_method(arr)
+  unless block_given?
+    puts 'No block given'
+    return
+  end
+
+  i = 0
+  while i < arr.count
+    el = arr[i]
+    yield el
+    i += 1
+  end
+end
+
+implicit_method(students) { |student| puts student }
+```
+
+**EXPLICITLY:**
+
+```ruby
+students = ['Greyson', 'Logan', 'Steve', 'Tony']
+
+def explicit_method(arr, &blk)
+    unless block_given?
+    puts 'No block given'
+    return
+  end
+
+  i = 0
+  while i < arr.count
+    el = arr[i]
+    blk.call(el)
+    i += 1
+  end
+end
+
+explicit_method(students) { |student| puts student }
+```
+
+*The `yield` method is a little faster but the explicit block is more readable.*
+
+- Pass a variable stored proc as argument in a function.
+
+```ruby
+def explicit_method(arr, &blk)
+    unless block_given?
+    puts 'No block given'
+    return
+  end
+
+  i = 0
+  while i < arr.count
+    el = arr[i]
+    blk.call(el)
+    i += 1
+  end
+end
+
+print_proc = Proc.new { |student| puts student }
+
+explicit_method(students, &print_proc)
+```
+
+- Currying:
+  - Technique to create specialized functions from existing functions.
+
+```ruby
+add = lambda { |a, b| a + b }
+add.call(100,200)
+# => 300
+
+increment = add.curry.call(1)
+increment.call(100)
+#=> 101
+```
+
+## PATTERN MATCH
+
+- Pattern matching uses specified patterns to match against some data.
+  - If the data conforms to the pattern there is a match and the data is deconstructed accordingly.
+  - If there is no match either you can supply a default value to return or else a `NoMatchingPatternError` is raised.
+- The basic format for a pattern match is a `case` statement.
+  - This is not too different from the case statement you will already be familiar with for matching conditions in Ruby, except now instead of `when` we use `in`.
+  - If your use case is very basic, you will find there is no difference between using either in or when as the below example illustrates.
+
+```ruby
+grade = 'C'
+
+case grade
+when 'A' then puts 'Amazing effort'
+when 'B' then puts 'Good work'
+when 'C' then puts 'Well done'
+when 'D' then puts 'Room for improvement'
+else puts 'See me'
+end
+
+# => Well done
+```
+
+```ruby
+grade = 'C'
+
+case grade
+in 'A' then puts 'Amazing effort'
+in 'B' then puts 'Good work'
+in 'C' then puts 'Well done'
+in 'D' then puts 'Room for improvement'
+else puts 'See me'
+end
+
+# => Well done
+```
+
+- The second format is for pattern match is a one line syntax using the hash rocket.
+
+```ruby
+login = { username: 'hornby', password: 'iliketrains' }
+
+login => { username: username }
+
+puts "Logged in with username #{username}"
+
+#=> Logged in with username hornby
+```
+
+- Note that we can use the hash rocket => to match against some kind of structure.
+- The `case/in` format is best used when there are multiple conditionals you could possibly match against and you need to check against all of them.
+- The hash rocket syntax is best used when the data structure you are matching against is known, such as the login data example we used above.
+
+### Patterns
+
+- There are multiple ways of potentially matching against an input. Patterns can be
+  - Any Ruby object which is matched using `===.` The Object Pattern.
+  - A variable capture / Variable Pattern
+  - An As Pattern
+  - An Alternative Pattern
+  - A Guard Condition
+  - An Array Pattern
+  - A Hash Pattern
+- You can use the above patterns while also having the following experimental additions
+  - Rightward Assignment
+  - A Find Pattern
+- Patterns can also be matched using many of the patterns above together.
+  - e.g. an array inside a hash we could use the hash and array patterns.
+
+### Return values
+
+- There are two possible return values from a pattern match statement.
+  - The first is `true` which is returned whenever there is a match, even when the match is the else clause in a statement.
+  - The second possible return value is a `NoMatchingPatternError` whenever no match can be found.
+- The point of a pattern match usually is to not only match against a pattern but also bind all or part of the match to one or more variables that you can then use outside of the pattern match expression.
+
+### Object Pattern Match
+
+- Any object can be used in a pattern match; it is matched using `===` to compare the two objects.
+- This pattern is usually used within other patterns such as the array pattern.
+- Because of this we can also check against data types
+
+```ruby
+input = 3
+
+case input
+in String then puts 'input was of type String'
+in Integer then puts 'input was of type Integer'
+end
+
+#=> input was of type Integer
 ```
