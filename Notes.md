@@ -40,7 +40,7 @@
     - [Predicate Methods and Bang Methods](#predicate-methods-and-bang-methods)
   - [ENUMERABLES](#enumerables)
     - [select and reject](#select-and-reject)
-    - [each and each_with_index](#each-and-each_with_index)
+    - [each and each\_with\_index](#each-and-each_with_index)
     - [map](#map)
     - [select or filter](#select-or-filter)
     - [reduce](#reduce)
@@ -3662,7 +3662,7 @@ end
 ### Alternative Pattern Match
 
 ```ruby
-ase 0
+case 0
 in 0 | 1 | 2
   puts :match
 end
@@ -3870,6 +3870,9 @@ in { a: a, b: b }
   puts a
   puts b
 end
+
+# => apple
+# => banana
 ```
 
 - Because of ruby syntactic sugar for hashes we could rewrite the above as below; note how we don’t have to provide names for the variables.
