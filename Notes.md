@@ -118,6 +118,11 @@
     - [Ruby 3 Patterns](#ruby-3-patterns)
       - [Rightward assignment](#rightward-assignment)
       - [Find Pattern](#find-pattern)
+  - [ALGORITHMS](#algorithms)
+    - [Intro to Algorithms](#intro-to-algorithms)
+    - [Queues and Stacks](#queues-and-stacks)
+      - [Stacks](#stacks)
+      - [Queues](#queues)
 
 ## CONTROL FLOW
 
@@ -4036,3 +4041,35 @@ puts first_language
   - This can be useful when getting to grips with code where the data may come from a third party api.
 
 **More on [Ruby Reference](https://rubyreferences.github.io/rubyref/language/pattern-matching.html)**.
+
+## ALGORITHMS
+
+### Intro to Algorithms
+
+- An algorithm is a set os steps fos a computer program to accomplish a task
+- A good algorithm:
+  - Solve a problem
+  - Does so efficiently
+- Algorithimic efficiency is measured by **Asymptotic Analysis**, which allows them to be compared independently of a particular programming language or hardware
+
+### Queues and Stacks
+
+#### Stacks
+
+- Stacks have a *Top* and a *Bottom*
+- Elements are sorted by insertion order
+- Last element in first out (**LIFO**)
+- Elements have no index; we can't access them from the middle of the stack
+- Can only add to stack (`push`) and remove from stack (`pop`) from the top
+- Useful in context in which you want to reverse the order of elements
+  - UNDO BUTTON: activities are stored in a stack order, when you press Undo, the activity undone is the last one performed.
+
+#### Queues
+
+- Queues gave a *Front* and a *Back*
+- Elements also sorted by insertion order
+- First element in first out (**FIFO**)
+- Elements also have no index
+- Can only add to queue in the back (`queue`) and remove from the front (`unqueue`)
+- Useful in context in which we are managing resources
+  - PRINT QUEUE: jobs to the same printer -- the first sending will be the first printed.
