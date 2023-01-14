@@ -4,7 +4,7 @@ A Ruby implementation of a linked list data structure. Part of [The Odin Project
 
 ## Usage
 
-To use the linked list, first require the linked_list.rb and node.rb files in your project:
+To use the linked list, first require the `linked_list.rb` and `node.rb` files in your project:
 
 ```ruby
 require_relative 'linked_list'
