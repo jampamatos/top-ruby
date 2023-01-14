@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative './linked_list'
+
 # The Node class represents a node in a linked list.
 # It has a value and a reference to the next node in the list.
 class Node

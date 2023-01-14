@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative 'linked_list'
-require_relative 'node'
+require_relative 'lib/linked_list'
+require_relative 'lib/node'
 
 puts 'Testind #append:'
 list = LinkedList.new
@@ -58,3 +58,6 @@ list5.append(30)
 puts list5
 puts list5.find(20)
 p list5.find(50)
+
+puts list5.head
+puts list5.tail

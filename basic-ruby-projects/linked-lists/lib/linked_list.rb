@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative './node'
+
 # The LinkedList class represents a linked list data structure.
 # It has a head node which references to the first node in the list, and
 # methods for adding, removing, and finding nodes in the list.
@@ -53,7 +55,7 @@ class LinkedList
   def tail
     curr_node = @head
     curr_node = curr_node.next_node until curr_node.next_node.nil?
-    curr_node
+    curr_node.value
   end
 
   def at(index)
