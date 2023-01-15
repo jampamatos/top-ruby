@@ -97,14 +97,24 @@ class Tree
     block_given? ? nil : values
   end
 
-  def inorder(node = @root, values = [])
-    inorder(node.left_child, values) if node.left_child
-    if block_given?
-      yield node.data
-    else
-      values << node.data
-    end
-    inorder(node.right_child, values) if node.right_child
+  def inorder(node = @root, values = [], &block)
+    inorder(node.left_child, values, &block) if node.left_child
+    block_given? ? block.call(node.data) : values << node.data
+    inorder(node.right_child, values, &block) if node.right_child
+    return values unless block_given?
+  end
+
+  def preorder(node = @root, values = [], &block)
+    block_given? ? block.call(node.data) : values << node.data
+    preorder(node.left_child, values, &block) if node.left_child
+    preorder(node.right_child, values, &block) if node.right_child
+    return values unless block_given?
+  end
+
+  def postorder(node = @root, values = [], &block)
+    postorder(node.left_child, values, &block) if node.left_child
+    postorder(node.right_child, values, &block) if node.right_child
+    block_given? ? block.call(node.data) : values << node.data
     return values unless block_given?
   end
 end
@@ -114,3 +124,7 @@ tree.pretty_print
 
 tree.inorder { |node_data| puts node_data }
 p tree.inorder
+tree.preorder { |node_data| puts node_data }
+p tree.preorder
+tree.postorder { |node_data| puts node_data }
+p tree.postorder
