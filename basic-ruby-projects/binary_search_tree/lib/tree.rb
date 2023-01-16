@@ -117,14 +117,34 @@ class Tree
     block_given? ? block.call(node.data) : values << node.data
     return values unless block_given?
   end
+
+  def height(node = @root)
+    return 1 unless node.left_child && node.right_child
+
+    left_height = height(node.left_child)
+    right_height = height(node.right_child)
+    [left_height, right_height].max + 1
+  end
+
+  def depth(value, node = @root, edges = 0)
+    return 0 unless node
+
+    return edges if node.data == value
+
+    left_depth = depth(value, node.left_child, edges + 1)
+    right_depth = depth(value, node.right_child, edges + 1)
+    [left_depth, right_depth].max
+  end
 end
 
-tree = Tree.new([1, 2, 3, 4, 5, 6, 7])
+tree = Tree.new([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 tree.pretty_print
 
-tree.inorder { |node_data| puts node_data }
-p tree.inorder
-tree.preorder { |node_data| puts node_data }
-p tree.preorder
-tree.postorder { |node_data| puts node_data }
-p tree.postorder
+#tree.inorder { |node_data| puts node_data }
+#p tree.inorder
+#tree.preorder { |node_data| puts node_data }
+#p tree.preorder
+#tree.postorder { |node_data| puts node_data }
+#p tree.postorder
+#p tree.height
+puts tree.depth(4)
