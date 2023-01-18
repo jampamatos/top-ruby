@@ -150,7 +150,39 @@ class Tree
 
     block_given? ? nil : values
   end
+
+  def height(node = @root)
+    # The base case is set to return -1 if the node is nil, this allows for the height of leaf nodes to be 0.
+    return -1 unless node
+
+    # The recursive call to calculate the height of the left and right children
+    # are added to the max of the two and 1 is added to that value to account for the current node.
+    left_height = height(node.left_child)
+    right_height = height(node.right_child)
+    [left_height, right_height].max + 1
+  end
+
+  def depth(node = @root)
+    return nil if node.nil?
+
+    current_node = @root
+    current_depth = 0
+
+    until current_node == node
+      current_depth += 1
+      current_node = current_node.left_child if node.data < current_node.data
+      current_node = current_node.right_child if node.data > current_node.data
+    end
+
+    current_depth
+  end
 end
 
 tree = Tree.new([1, 3, 5, 7, 9, 11, 13, 15, 17])
 tree.pretty_print
+
+p tree.height
+p tree.depth
+
+p tree.height(tree.find(1))
+p tree.depth(tree.find(1))
