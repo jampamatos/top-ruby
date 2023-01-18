@@ -73,22 +73,41 @@ class Tree
     end
     node
   end
+
+  def find(data, node = @root)
+    return nil unless node
+
+    return node if node.data == data
+
+    left = find(data, node.left_child) if data < node.data
+    return left if left
+
+    right = find(data, node.right_child) if data > node.data
+    return right if right
+
+    nil
+  end
+
+  def level_order(node = @root)
+    queue = [node]
+    values = [] unless block_given?
+
+    until queue.empty?
+      next_node = queue.shift
+      if block_given?
+        yield next_node
+      else
+        values << next_node.data
+      end
+      queue << next_node.left_child if next_node.left_child
+      queue << next_node.right_child if next_node.right_child
+    end
+    values unless block_given?
+  end
 end
 
-puts 'Before Changes:'
 tree = Tree.new([1, 3, 5, 7, 9, 11, 13, 15, 17])
 tree.pretty_print
 
-tree.insert(2)
-tree.insert(10)
-tree.insert(8)
-tree.pretty_print
-
-puts ''
-
-tree.delete(2)
-tree.pretty_print
-tree.delete(11)
-tree.pretty_print
-tree.delete(9)
-tree.pretty_print
+tree.level_order { |node| puts node.data }
+p tree.level_order
