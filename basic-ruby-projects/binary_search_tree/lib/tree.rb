@@ -163,7 +163,7 @@ class Tree
   end
 
   def depth(node = @root)
-    return nil if node.nil?
+    return -1 if node.nil?
 
     current_node = @root
     current_depth = 0
@@ -186,3 +186,4 @@ p tree.depth
 
 p tree.height(tree.find(1))
 p tree.depth(tree.find(1))
+p tree.depth(tree.find(50))
