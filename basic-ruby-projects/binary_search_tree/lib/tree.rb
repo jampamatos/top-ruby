@@ -104,10 +104,53 @@ class Tree
     end
     values unless block_given?
   end
+
+  def inorder(node = @root, values = [], &block)
+    return nil unless node
+
+    inorder(node.left_child, values, &block) if node.left_child
+
+    if block_given?
+      block.call(node)
+    else
+      values << node.data
+    end
+
+    inorder(node.right_child, values, &block) if node.right_child
+
+    block_given? ? nil : values
+  end
+
+  def preorder(node = @root, values =[], &block)
+    return nil unless node
+
+    if block_given?
+      block.call(node)
+    else
+      values << node.data
+    end
+
+    preorder(node.left_child, values, &block) if node.left_child
+    preorder(node.right_child, values, &block) if node.right_child
+
+    block_given? ? nil : values
+  end
+
+  def postorder(node = @root, values =[], &block)
+    return nil unless node
+
+    postorder(node.left_child, values, &block) if node.left_child
+    postorder(node.right_child, values, &block) if node.right_child
+
+    if block_given?
+      block.call(node)
+    else
+      values << node.data
+    end
+
+    block_given? ? nil : values
+  end
 end
 
 tree = Tree.new([1, 3, 5, 7, 9, 11, 13, 15, 17])
 tree.pretty_print
-
-tree.level_order { |node| puts node.data }
-p tree.level_order
