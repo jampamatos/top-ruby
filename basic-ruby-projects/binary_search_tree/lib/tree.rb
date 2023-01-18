@@ -176,14 +176,23 @@ class Tree
 
     current_depth
   end
+
+  def balanced?(node = @root)
+    return true if node.nil?
+
+    left_height = height(node.left_child)
+    right_height = height(node.right_child)
+    (left_height - right_height).abs <= 1 && balanced?(node.left_child) && balanced?(node.right_child)
+  end
+
+  def rebalance
+    return if balanced?
+
+    # Collect all the data in the tree using an in-order traversal
+    data = []
+    inorder { |node| data << node.data }
+
+    # Rebuild the tree using the sorted data
+    @root = build_tree(data.sort)
+  end
 end
-
-tree = Tree.new([1, 3, 5, 7, 9, 11, 13, 15, 17])
-tree.pretty_print
-
-p tree.height
-p tree.depth
-
-p tree.height(tree.find(1))
-p tree.depth(tree.find(1))
-p tree.depth(tree.find(50))
