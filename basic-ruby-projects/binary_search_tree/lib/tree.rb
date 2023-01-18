@@ -2,6 +2,11 @@
 
 require_relative 'node'
 
+# The Tree class is a binary search tree data structure implemented in Ruby.
+# Initializes a new instance of the Tree class with a given array of data.
+# Sorts the array and builds a balanced binary search tree from the sorted data.
+#
+# @param arr [Array<Integer>] an array of integers to create the tree with
 class Tree
   attr_accessor :root
 
