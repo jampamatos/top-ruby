@@ -17,6 +17,13 @@
     - [2.3.Nesting tables](#23nesting-tables)
     - [2.4. Tables for visually impaired users](#24-tables-for-visually-impaired-users)
     - [2.5. Examples of scopes and headers](#25-examples-of-scopes-and-headers)
+  - [3. CSS UNITS](#3-css-units)
+    - [3.1. CSS values](#31-css-values)
+    - [3.2. `em`, `rem` and percentage](#32-em-rem-and-percentage)
+    - [3.3. Viewport Units](#33-viewport-units)
+  - [4. MORE TEXT STYLES](#4-more-text-styles)
+    - [4.1. Fonts](#41-fonts)
+    - [4.2. Text Styles](#42-text-styles)
 
 ## 1. TABLES - BASIC STUFF
 
@@ -1494,6 +1501,415 @@ tfoot {
   </table>
 </body>
 ```
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+## 3. CSS UNITS
+
+- This lesson will introduce the most important units, and show you where to learn about the rest of them.
+- **Absolute Units:**
+  - Absolute units are those that are always the same in any context.
+  - `px` is an absolute unit because the size of a pixel doesn’t change relative to anything else on the page, and is the only absolute unit you should be using for web projects.
+  - The rest of them make more sense in a print setting because they are related to physical units such as `in` (inch) and `cm` (centimeter).
+- **Relative Units:**
+  - Relative units are units that can change based on their context.
+  - There are several of them that you are likely to encounter and want to use.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+### 3.1. CSS values
+
+- Every property used in CSS has a value type defining the set of values that are allowed for that property.
+- Taking a look at any property will help you understand the values associated with a value type that are valid for any particular property.
+- In CSS specifications you will be able to spot value types as they will be surrounded by angle brackets, such as `<color>` or `<length>`.
+- When you see the value type `<color>` as valid for a particular property, that means you can use any valid color as a value for that property, as listed on the [`<color>`](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value) reference page on MDN.
+- **Note:** You'll also see CSS value types referred to as data types. The terms are basically interchangeable — when you see something in CSS referred to as a data type, it is really just a fancy way of saying value type. The term value refers to any particular expression supported by a value type that you choose to use.
+- **Note:** Yes, CSS value types tend to be denoted using angle brackets to differentiate them from CSS properties (e.g., the `color` property, versus the `<color>` data type). You might get confused between CSS data types and HTML elements too, as they both use angle brackets, but this is unlikely — they are used in very different contexts.
+- In the following example, we have set the color of our heading using a keyword, and the background using the rgb() function:
+
+```css
+h1 {
+  color: black;
+  background-color: rgb(197, 93, 161);
+}
+```
+
+- A value type in CSS is a way to define a collection of allowable values.
+- This means that if you see `<color>` as valid you don't need to wonder which of the different types of color value can be used — keywords, hex values, rgb() functions, etc.
+- You can use any available `<color>` values, assuming they are supported by your browser.
+- Let's have a look at some of the types of values and units you may frequently encounter, with examples so that you can try out different possible values.
+- There are various numeric value types that you might find yourself using in CSS. The following are all classed as numeric:
+
+![Numeric data types](assets/images/table2.png)
+
+- The numeric type you will come across most frequently is `<length>`.
+- For example, `10px` (pixels) or `30em`.
+- There are two types of lengths used in CSS — relative and absolute. It's important to know the difference in order to understand how big things will become.
+
+![Absolute length units](assets/images/absolute_table.png)
+
+![Relative length units](assets/images/relative_table.png)
+
+### 3.2. `em`, `rem` and percentage
+
+- `em` and `rem` both refer to a font size, though they are often used to define other sizes in CSS.
+  - As a rule-of-thumb, prefer `rem`.
+- `1em` is the `font-size` of an element (or the element’s parent if you’re using it to set `font-size`).
+  - So, for example, if an element’s `font-size` is `16px`, then setting its width to `4em` would make its width `64px` (16 * 4 == 64).
+- `1rem` is the `font-size` of the root element (either `:root` or `html`).
+  - The math works the same with `rem` as it did with `em`, but without the added complexity of keeping track of the parent’s font size.
+  - Relying on `em` could mean that a particular size could change if the context changes, which is very likely not the behavior you want.
+- Using a relative size like `rem` to define font sizes across your website is recommended.
+- Many browsers allow users to change the base `font-size` to increase readability.
+- If at all possible, it is advisable to respect a user’s wishes regarding font size.
+- The HTML illustrated below is a set of nested lists — we have three lists in total and both examples have the same HTML -- the only difference is that the first has a class of ems and the second a class of rems.
+- To start with, we set 16px as the font size on the `<html>` element.
+
+```html
+<ul class="ems">
+  <li>One</li>
+  <li>Two</li>
+  <li>Three
+    <ul>
+      <li>Three A</li>
+      <li>Three B
+        <ul>
+          <li>Three B 2</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<ul class="rems">
+  <li>One</li>
+  <li>Two</li>
+  <li>Three
+    <ul>
+      <li>Three A</li>
+      <li>Three B
+        <ul>
+          <li>Three B 2</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+```
+
+```css
+html {
+  font-size: 16px;
+}
+
+.ems li {
+  font-size: 1.3em;
+}
+
+.rems li {
+  font-size: 1.3rem;
+}
+```
+
+<html>
+  <head>
+    <style>
+      html { font-size: 16px; }
+      .ems li { font-size: 1.3em; }
+      .rems li { font-size: 1.3rem;}
+      .wrapper { border: 3px solid black}
+    </style>
+  <head>
+  <body>
+    <div class="wrapper">
+      <ul class="ems">
+        <li>One</li>
+        <li>Two</li>
+        <li>Three
+          <ul>
+            <li>Three A</li>
+            <li>Three B
+              <ul>
+                <li>Three B 2</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+        <ul class="rems">
+        <li>One</li>
+        <li>Two</li>
+        <li>Three
+          <ul>
+            <li>Three A</li>
+            <li>Three B
+              <ul>
+                <li>Three B 2</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </body>
+</html>
+<br>
+
+- **To recap, the `em` unit means "my parent element's font-size"** in the case of typography.
+  - The `<li>` elements inside the `<ul>` with a class of `ems` take their sizing from their parent.
+  - So each successive level of nesting gets progressively larger, as each has its font size set to `1.3em` — 1.3 times its parent's font size.
+
+- **To recap, the `rem` unit means "The root element's font-size"** (`rem` stands for "root em").
+  - The `<li>` elements inside the `<ul>` with a class of `rems` take their sizing from the root element (`<html>`).
+  - This means that each successive level of nesting does not keep getting larger.
+  - However, if you change the `<html>` element's font-size in the CSS you will see that everything else changes relative to it — both `rem`- and `em`-sized text.
+
+- **Percentages** are always set relative to some other value.
+- For example, if you set an element's `font-size` as a percentage, it will be a percentage of the `font-size` of the element's parent.
+- If you use a percentage for a `width` value, it will be a percentage of the `width` of the parent.
+- In the below example the two percentage-sized boxes and the two pixel-sized boxes have the same class names. The sets are 40% and 200px wide respectively.
+- The difference is that the second set of two boxes is inside a wrapper that is 400 pixels wide. The second 200px wide box is the same `width` as the first one, but the second 40% box is now 40% of 400px — a lot narrower than the first one!
+
+```html
+<div class="box px">I am 200px wide</div>
+<div class="box percent">I am 40% wide</div>
+<div class="wrapper">
+  <div class="box px">I am 200px wide</div>
+  <div class="box percent">I am 40% wide</div>
+</div>
+```
+
+```css
+.wrapper {
+  width: 400px;
+  border: 5px solid rebeccapurple;
+}
+
+.px {
+  width: 200px;
+}
+
+.percent {
+  width: 40%;
+}
+```
+
+<html>
+  <head>
+    <style>
+      .body { border: 3px solid black; padding: 10px}
+      .wrapper { width: 400px; border: 5px solid rebeccapurple; }
+      .px { width: 200px; border: 4px solid darkblue; margin: 10px 0}
+      .percent { width: 40%; border: 4px solid darkblue; margin: 10px 0 }
+    </style>
+  </head>
+  <body>
+    <div class="body">
+      <div class="box px">I am 200px wide</div>
+      <div class="box percent">I am 40% wide</div>
+      <div class="wrapper">
+        <div class="box px">I am 200px wide</div>
+        <div class="box percent">I am 40% wide</div>
+      </div>
+    </div>
+  </body>
+<html>
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+### 3.3. Viewport Units
+
+- The units `vh` and `vw` relate to the size of the viewport.
+- Specifically, `1vh` is equal to 1% of the viewport height and `1vw` is equal to 1% of the viewport width.
+- These can be useful any time you want something to be sized relative to the viewport, examples including full-height heroes, full-screen app-like interfaces.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+## 4. MORE TEXT STYLES
+
+This lesson will cover a few more useful CSS properties that can be used when working with text.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+### 4.1. Fonts
+
+- In our Foundations lesson, we covered changing the `font-family` of an element, but there is some nuance and detail that we left out at the time: the **System Font Stack**
+- If you use the `font-family` property to change to a font like impact or Times New Roman, and those fonts do not happen to be installed on your user’s computer, then a fallback font will be displayed.
+- If you have not defined a fallback, then the default HTML font will be used, which is often somewhat ugly.
+- For this reason, it’s common to see somewhat long stacks of fonts listed on projects.
+- One popular stack is this ‘system font’ stack. [Source: CSS Tricks](https://css-tricks.com/snippets/css/system-font-stack/)
+
+```css
+body {
+  font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+```
+
+- The point of this string of font-families is to try using the default font of the system’s user interface.
+- It will go through each of those fonts until it finds one that is installed on the system, and then use that.
+- Using a stack like this often produces pleasing results, especially if you’re going for a somewhat ‘neutral’ font style.
+- One popular and easy method to get fonts that are not installed on a user’s computer is to use an online font library like [Google Fonts](https://fonts.google.com/), [Font Library](https://fontlibrary.org) or the premium, but non-free [Adobe Fonts](https://fonts.adobe.com/).
+- To use a font from one of these libraries, go to the website, select a font and then copy a snippet from the website to import that font from their server into your website; you’ll be given either a `<link>` tag to put in your HTML like so:
+
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+```
+
+- or an @import tag that can be dropped at the top of a CSS file:
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+```
+
+- Either method will import that font and make it available for you to use in your CSS
+
+```css
+body {
+  font-family: 'Roboto', sans-serif;
+}
+```
+
+- Keep in mind if you’re linking to an external API, you have no guarantee that the URL won’t change, or that the external API won’t go down at some point.
+- Having a reasonable fallback means that if something goes wrong, at least your site won’t look completely broken.
+- It is also possible to use a font that you have downloaded from the web.
+- In your CSS file, you import and define a custom font using the `@font-face` rule, and then use as you would any other `font-family`.
+- There are multiple types of font file formats and you can read more in depth about them on [fileinfo.com’s page on Font File Formats](https://fileinfo.com/filetypes/font).
+- Please take care when choosing a font file format however, because some are not universally supported by browsers; a list of browsers and the font formats they support can be found on [W3 Schools’ page on CSS Web Fonts](https://www.w3schools.com/css/css3_fonts.asp).
+
+```css
+@font-face {
+  font-family: my-cool-font;
+  src: url(../fonts/the-font-file.woff);
+}
+
+h1 {
+  font-family: my-cool-font, sans-serif;
+}
+```
+
+- This method may be more reliable than relying on a third-party font API, but it is always wise to include a fallback.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+### 4.2. Text Styles
+
+- You learned the basics of manipulating fonts in our Foundations lessons, but there is quite a bit more that you can do with CSS when it comes to manipulating text styles.
+- These rules are all relatively simple and self-explanatory; you can refer to the docs for any questions you might have.
+- **`font-style`**: typically used to make a font italic.
+  - You learned about the HTML `<em>` tag, which uses an italic font, but `<em>` also signifies that the text it wraps is significant or should be emphasized in some way.
+  - A good rule of thumb to follow is that if you just want text to be italic (or bold, underlined, highlighted, etc.), use a CSS property.
+  - Otherwise, if text should have some sort of semantic emphasis, use the correct HTML element.
+  - For example, if you want all your header text to be italic you should use font-style to accomplish this; if you want some text in the middle of a sentence to appear italic in order to emphasize that text, it is appropriate to use an em element.
+  - The [MDN doc on the Emphasis Element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/em) puts stress on our point above.
+  - We should use `font-style: italic;` if italics is required for styling purposes; we should use the `em` element if italics is required for emphasis.
+
+```css
+h1 {
+  font-style: italic;
+}
+```
+
+```html
+<p>I <em>never</em> said he stole your money</p>
+<p>I never said <em>he</em> stole your money</p>
+<p>I never said he stole <em>your</em> money</p>
+```
+
+- **`letter-spacing`**: changes the space between letters in a word.
+  - This can be useful for adjusting custom fonts that you feel have too much or too little space.
+  - It can also be aesthetically pleasing in some cases, like headers.
+
+```html
+<link rel="stylesheet" media="screen" href="https://fontlibrary.org//face/couture" type="text/css"/>
+
+<h1>Hello World!</h1>
+<h1 class="wide">Hello World!</h1>
+<h1 class="narrow">Hello World!</h1>
+```
+
+```css
+h1 {
+  font-family: 'COUTUREBold';
+  margin: 0;
+  font-size: 38px;
+}
+
+.wide {
+  font-size: 24px;
+  letter-spacing: .5em;
+}
+
+.narrow {
+  font-size: 48px;
+  letter-spacing: -.15em;
+}
+```
+
+<br>
+<html>
+  <head>
+  <link rel="stylesheet" media="screen" href="https://fontlibrary.org//face/couture" type="text/css"/>
+    <style>
+      h1 {font-family: 'COUTUREBold'; margin: 0; font-size: 38px;}
+      .wide { font-size: 24px; letter-spacing: .5em; }
+      .narrow { font-size: 48px; letter-spacing: -.15em; }
+    </style>
+  </head>
+  <body>
+    <h1>Hello World!</h1>
+    <h1 class="wide">Hello World!</h1>
+    <h1 class="narrow">Hello World!</h1>
+  </body>
+</html>
+
+- **`line-height`** adjusts the space between lines in wrapped text.
+  - Adding a little `line-height` can increase readability.
+- **`text-transform`**: changes the case of the given text.
+  - You can use this, for example, to force your heading tags to be all uppercase, or to capitalize every word.
+  - Usage is simple, and can be seen in the clear example on these [MDN web docs](https://developer.mozilla.org/en-US/docs/Web/CSS/text-transform).
+- **`text-shadow`**: adds a shadow around the text in the selected element.
+  - This one is best used sparingly, but can be used to great effect in headings or other presentational text.
+  - The examples on the [MDN reference page](https://developer.mozilla.org/en-US/docs/Web/CSS/text-shadow) for text-shadow show how to use it.
+- **ellipsis**: this one isn’t a single property, but it’s a useful trick to keep in your toolbox.
+  - With the `text-overflow` property, you can truncate overflowing text with an ellipsis.
+  - Making an overflow happen, however, requires the use of a couple other properties because the default behavior of text simply printing outside its container isn’t technically considered an overflow.
+  - The full snippet is:
+
+```css
+.overflowing {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+```
+
+You can see more detail and an example in this [CSS Tricks Article](https://css-tricks.com/snippets/css/truncate-string-with-ellipsis/). (Be ready to go look that article up every time you want to use this.)
 
 <div style="text-align: right">
 
