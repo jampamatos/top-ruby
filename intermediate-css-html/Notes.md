@@ -24,6 +24,29 @@
   - [4. MORE TEXT STYLES](#4-more-text-styles)
     - [4.1. Fonts](#41-fonts)
     - [4.2. Text Styles](#42-text-styles)
+  - [5. MORE CSS PROPERTIES](#5-more-css-properties)
+    - [5.1. Background](#51-background)
+    - [5.2. Borders](#52-borders)
+    - [5.3. Box Shadow](#53-box-shadow)
+    - [5.4. Overflow](#54-overflow)
+    - [5.5. Opacity](#55-opacity)
+  - [6. ADVANCED SELECTORS](#6-advanced-selectors)
+    - [6.1. Parent/Sibling Combinators](#61-parentsibling-combinators)
+    - [6.2. Pseudo-selectors](#62-pseudo-selectors)
+      - [6.2.1. Dynamic and User-Action Pseudo-Classes](#621-dynamic-and-user-action-pseudo-classes)
+      - [6.2.2. Structural Pseudo-Classes](#622-structural-pseudo-classes)
+      - [6.2.3. Pseudo-Elements](#623-pseudo-elements)
+      - [6.2.4. Attribute Selectors](#624-attribute-selectors)
+  - [7.POSITIONING](#7positioning)
+    - [7.1. Static and Relative Positioning](#71-static-and-relative-positioning)
+    - [7.2. Absolute Positioning](#72-absolute-positioning)
+    - [7.3. Fixed Positioning](#73-fixed-positioning)
+    - [7.4. Sticky Positioning](#74-sticky-positioning)
+  - [8. FUNCTIONS](#8-functions)
+    - [8.1. `calc()` Function](#81-calc-function)
+    - [8.2. `min()`function](#82-minfunction)
+    - [8.3. `max()` function](#83-max-function)
+    - [8.4. `clamp()` function](#84-clamp-function)
 
 ## 1. TABLES - BASIC STUFF
 
@@ -1916,3 +1939,524 @@ You can see more detail and an example in this [CSS Tricks Article](https://css-
 [BACK TO TOP](#table-of-contents)
 
 </div>
+
+## 5. MORE CSS PROPERTIES
+
+### 5.1. Background
+
+- You’ve likely already experimented with setting `background` colors on things, but the `background` property  is actually a shorthand for 8 different background-related properties.
+- You can specify background images, change the position and size of background images, and change how background images repeat or tile if they are too small to fill their container.
+- It is also possible to have multiple background layers.
+- It is possible to use these properties individually, and in some cases it might be easier and more clear to do that than defaulting to the shorthand.
+- This is in contrast to some other shorthand properties where it is almost always preferable to default to using the shorthand (`flex`, `margin`, `padding` etc.)
+- More information on the `background` property can be found on the [MDN docs](https://developer.mozilla.org/en-US/docs/Web/CSS/background).
+
+### 5.2. Borders
+
+- The `border` property is a shorthand for the `border-width`, `border-style`, and `border-color` properties, but much less complicated.
+- For `border`we basically just need to specify the width, style, and color of the border.
+- `border-radius` is a property that allows you to round the corners of an element’s border.
+- More information on the `border` property can be found on the [`border` MDN docs](https://developer.mozilla.org/en-US/docs/Web/CSS/border), and on `border-radius` on the [`border-radius` MDN docs](https://developer.mozilla.org/en-US/docs/Web/CSS/border-radius).
+
+### 5.3. Box Shadow
+
+- The `box-shadow` property allows you to add a shadow to the box of an element. This is useful for adding depth to elements, or for adding a subtle shadow to text.
+- Its usage is similar to the `text-shadow` property, but it is applied to the box of the element rather than the text itself.
+- Its best to use this sparingly, but it can be a nice touch in the right place. Prefer lighter shadows to darker ones.
+- More information on the `box-shadow` property can be found on the [`box-shadow` MDN docs](https://developer.mozilla.org/en-US/docs/Web/CSS/box-shadow).
+
+### 5.4. Overflow
+
+- The `overflow` property is used to control what happens when content overflows the boundaries of its container.
+- Most common use cases are to hide the overflow, or to allow the overflow to scroll, for example a `card` component that has a fixed height and a scrollable overflow.
+- More information on the `overflow` property can be found on the [`overflow` MDN docs](https://developer.mozilla.org/en-US/docs/Web/CSS/overflow).
+
+### 5.5. Opacity
+
+- The `opacity` property allows you to set the opacity of an element.
+- This is useful for creating a semi-transparent overlay, or for fading out an element.
+- More information on the `opacity` property can be found on the [`opacity` MDN docs](https://developer.mozilla.org/en-US/docs/Web/CSS/opacity).
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+## 6. ADVANCED SELECTORS
+
+### 6.1. Parent/Sibling Combinators
+
+- Some ways to access diferent elements without using classes or ids:
+  - `>`: the child combinator
+  - `+`: the adjacent sibling combinator
+  - `~`: the general sibling combinator
+
+Example:
+
+```html
+<main class="parent">
+  <div class="child group1">
+    <div class="grand-child group1"></div>
+  </div>
+  <div class="child group2">
+    <div class="grand-child group2"></div>
+  </div>
+  <div class="child group3">
+    <div class="grand-child group3"></div>
+  </div>
+</main>
+```
+
+- If we wanted to select **all** the `child` and `grand-child` divs inside of `main`, we could write:
+
+```css
+main div {
+  /* Our cool CSS */
+}
+```
+
+- But what if we wanted to be more specific and select only the `child` **or** `grand-child` divs?
+- Then we use the child combinator `>`:
+
+```css
+/* This rule will only select divs with a class of child */
+
+main > div {
+  /* Our cool CSS */
+}
+
+
+/* This rule will only select divs with a class of grand-child */
+
+main > div > div {
+  /* More cool CSS */
+}
+```
+
+- The child selector will select an element that is one level of indentation down.
+- In order to select an element that is adjacent to our target, or on the same level of indentation, we can use the adjacent sibling combinator `+`:
+
+```css
+
+
+/* This rule will only select the div with the class child group2 */
+
+.group1 + div {
+  /* Our cool CSS */
+}
+
+
+/* This rule will only select the div with the class child group3 */
+
+.group1 + div + div {
+  /* More cool CSS */
+}
+```
+
+- Finally, if we want to select all of an element’s siblings and not just the first one, we can use the general sibling combinator `~`:
+
+```css
+/* This rule will select all of .group1's siblings - in this case the 2nd and 3rd .child divs */
+
+.group1 ~ div {
+  /* Our cool CSS */
+}
+```
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+### 6.2. Pseudo-selectors
+
+- **Note:** the difference between pseudo-elements and pseudo-classes is:
+  - **Pseudo-class selectors** are prefixed with a *single colon* and are a different way to target elements that already exist in HTML.
+  - **Pseudo-elements** are prefixed with *two colons* and are used to target elements that don’t normally exist in the markup.
+- Pseudo-classes offer us different ways to target elements in our HTML.
+- Some are based on their position or structure within the HTML, others are based on the state of a particular element, or how the user is currently interacting with it.
+- Pseudo-classes share the same specificity as regular classes (0, 0, 1, 0). Just like regular classes, most can be chained together.
+- **Note:** The (0,0,1,0) above is the notation for calculating specificity. To find out more about how it works, glance over the “Calculating CSS Specificity Value” section from this article on [CSS Specificity](https://css-tricks.com/specifics-on-css-specificity/).
+
+#### 6.2.1. Dynamic and User-Action Pseudo-Classes
+
+- `:focus`: targets an element that is currently focused on by the user, either by selecting with their cursor or using the keyboard.
+- `:hover`: targets an element that the user is currently hovering over with their cursor.
+- `:active`: targets an element that the user is currently interacting with, for example by clicking on it, and is especially useful for giving your user feedback that their action had an effect.
+- `:link`: targets an element that has not yet been visited by the user.
+- `:visited`: targets an element that has been visited by the user.
+
+#### 6.2.2. Structural Pseudo-Classes
+
+- `:root`: targets the root element of the document, which generally is the `html` element, but there are a few subtle differences. It's generally the place where you will place your ‘global’ CSS rules that you want available everywhere - such as your custom properties and CSS variables, or rules such as `box-sizing: border-box;`.
+- `:first-child`: targets the first child of its parent.
+- `:last-child`: targets the last child of its parent.
+- `:empty`: targets an element that has no children.
+- `:only-child`: targets an element that is the only child of its parent.
+- `:nth-child(n)`: targets an element that is the nth child of its parent. For example, `:nth-child(2)` would target the second child of its parent, `:nth-child(3)` would target the third child, and so on.
+
+```css
+.myList:nth-child(5) {/* Selects the 5th element with class myList */}
+
+  .myList:nth-child(3n) { /* Selects every 3rd element with class myList */}
+
+  .myList:nth-child(3n + 3) { /* Selects every 3rd element with class myList, beginning with the 3rd */}
+
+  .myList:nth-child(even) {/* Selects every even element with class myList */}
+```
+
+#### 6.2.3. Pseudo-Elements
+
+- They allow us to affect parts of our HTML that aren’t elements at all, such as:
+- `::marker`: targets the bullet point of a list item.
+- `::first-letter`: targets the first letter of a block of text.
+- `::first-line`: targets the first line of a block of text.
+- `::selection`: targets the text that the user has currently selected.
+- `::before`: targets the pseudo-element that comes before the selected element in the markup.
+- `::after`: targets the pseudo-element that comes after the selected element in the markup.
+
+```html
+<style>
+  .emojify::before {
+    content: '😎 🥸 🤓';
+}
+
+  .emojify::after {
+    content: '🤓 🥸 😎';
+}
+</style>
+
+<body>
+  <div> Let's <span class="emojify">emojify</span>this span!</div>
+</body>
+```
+
+<style>
+  .emojify::before {
+    content: '😎 🥸 🤓';
+}
+
+  .emojify::after {
+    content: '🤓 🥸 😎';
+}
+</style>
+
+<body>
+  <div> Let's <span class="emojify">emojify</span>this span!</div>
+</body>
+
+#### 6.2.4. Attribute Selectors
+
+- Since we write our own values for attributes, we need a slightly more flexible system to be able to target specific values.
+- `[attribute]`: targets an element that has the specified attribute.
+- `selector[attribute]`: targets an element that has the specified attribute and is also of the specified type.
+- `[attribute=value]`: targets an element that has the specified attribute with a value exactly equal to the specified value.
+
+```css
+  [src] {
+    /* This will target any element that has a src attribute. */
+  }
+
+  img[src] {
+    /* This will only target img elements that have a src attribute. */
+  }
+
+  img[src="puppy.jpg"] {
+    /* This will target img elements with a src attribute that is exactly "puppy.jpg" */
+  }
+```
+
+- Sometimes we need to be more general in how we access these attributes, i.e., we’re only interested in `img` elements where the `src` attribute’s value ends in `.jpg`.
+- For cases like this we have some attribute selectors that allow us to match a part of the attribute’s value.
+
+- `[attribute^=value]`: targets an element that has the specified attribute with a value that begins exactly with the specified value.
+- `[attribute$=value]`: targets an element that has the specified attribute with a value that ends exactly with the specified value.
+- `[attribute*=value]`: targets an element that has the specified attribute with a value that contains the specified value anywhere within it.
+
+```css
+[class^='aus'] {
+  /* Classes are attributes too!
+    This will target any class that begins with 'aus':
+    class='austria'
+    class='australia'
+  */
+}
+
+[src$='.jpg'] {
+  /* This will target any src attribute that ends in '.jpg':
+  src='puppy.jpg'
+  src='kitten.jpg'
+  */
+}
+
+[for*='ill'] {
+  /* This will target any for attribute that has 'ill' anywhere inside it:
+  for="bill"
+  for="jill"
+  for="silly"
+  for="ill"
+  */
+}
+```
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+## 7.POSITIONING
+
+### 7.1. Static and Relative Positioning
+
+- The default positioning mode that you’ve gotten used to is `position: static`.
+- The difference between static and relative is fairly simple:
+  - Static is the default position of every element, and properties `top`, `right`, `bottom`, and `left` do not affect the position of the element.
+  - Relative on the other hand is pretty much the same as static, but properties displace the element relative to its normal position in the flow of the document.
+
+### 7.2. Absolute Positioning
+
+- `position: absolute` allows you to position something at an exact point on the screen without disturbing the other elements around it.
+- Using absolute positioning on an element will remove that element from the normal document flow while being positioned relative to an ancestor element.
+- That is, they don’t affect other elements and are also not affected by other elements.
+- Using absolute positioning allows you to position elements anywhere on the screen using `top`, `right`, `bottom`, and `left` properties.
+- This property is really useful when you want to position something at an exact point on the screen, without disturbing any of the other elements.
+- A couple of good use cases for absolute positioning are:
+  - modals
+  - image with a caption on it
+  - icons on top of other elements
+- **Disclaimer:** absolute positioning has very specific use cases and if possible, using flexbox or grid should be prioritized. Absolute positioning shouldn’t be used to do entire page layouts.
+
+### 7.3. Fixed Positioning
+
+- Fixed elements are also removed from the normal flow of the document and are positioned relative to the viewport.
+- You basically use `top`, `right`, `bottom`, and `left` properties to position it, and it will stay there as the user scrolls.
+- This is especially useful for things like navigation bars and floating chat buttons.
+
+### 7.4. Sticky Positioning
+
+- Sticky elements will act like normal elements until you scroll past them, then they start behaving like fixed elements.
+- They are also not taken out of the normal flow of the document.
+- It’s useful for things like section-headings, like being able to still see what category you’re looking at while scrolling through a shop.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+## 8. FUNCTIONS
+
+- Some property values in CSS have a slightly different syntax: when the value is a word followed by a pair of parentheses () containing information between them - as in `background-color: rgb(0, 0, 0)` - it's a CSS function.
+- Functions in CSS are reusable pieces of code which perform specific tasks.
+- Functions are passed “arguments” between parentheses, each of which is used by the function in a specific way.
+
+```css
+color: rgb(0, 42, 255);
+background: linear-gradient(90deg, blue, red);
+```
+
+ - Here, the value of `color` is the function `rgb()`, which accepts arguments in the form of numbers.
+ - It processes those numbers to calculate the rgb color corresponding to the three values given.
+ - Similarly, the `background property` has a value of `linear-gradient(90deg, blue, red)` that generates a gradient image using the parameters it’s been given.
+ - Unlike programming languages, CSS does not allow us to create our own functions.
+ - Instead, the language comes bundled with a list of premade functions that will help you solve the most common styling problems.
+
+### 8.1. `calc()` Function
+
+- The most powerful use cases for calc include:
+  - Mixing units
+  - The ability to nest `calc( calc () - calc () )`
+
+```html
+<html>
+  <head>
+    <style>
+      :root { --header: 3rem; --footer: 40px; --main: calc(100vh - calc(var(--header) + var(--footer))); }
+      body { margin: 0; padding: 0; border: 0px solid transparent; }
+      #container {
+        border: 0px solid transparent;
+        height: 100vh;
+        color: white;
+      }
+    #container > * {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #header {
+      height: var(--header);
+      background: #111111;
+    }
+    #mainContent {
+      height: var(--main);
+      background: #343434;
+      margin-right: auto;
+      margin-left: auto;
+    }
+    #footer {
+      height: var(--footer);
+      background: #232323;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <header id="header">< header /></header>
+      <main id="mainContent">< main content /></main>
+      <footer id="footer">< footer /></footer>
+    </div>
+  </body>
+</html>
+```
+
+<html>
+  <head>
+    <style>
+      :root { --header: 3rem; --footer: 40px; --main: calc(100vh - calc(var(--header) + var(--footer))); }
+      body { margin: 0; padding: 0; border: 0px solid transparent; }
+      #container {
+        border: 0px solid transparent;
+        height: 100vh;
+        color: white;
+      }
+    #container > * {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #header {
+      height: var(--header);
+      background: #111111;
+    }
+    #mainContent {
+      height: var(--main);
+      background: #343434;
+      margin-right: auto;
+      margin-left: auto;
+    }
+    #footer {
+      height: var(--footer);
+      background: #232323;
+    }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <header id="header">< header /></header>
+      <main id="mainContent">< main content /></main>
+      <footer id="footer">< footer /></footer>
+    </div>
+  </body>
+</html>
+<br>
+
+- Take a look at how calc() is being used here:
+
+```css
+:root {
+--header: 3rem;
+--footer: 40px;
+--main: calc(100vh - calc(var(--header) + var(--footer)));
+}
+
+/* --header, --footer, and --main are all examples of CSS variables. */
+```
+
+- Setting main to equal the outcome of: `100vh - (3rem + 40px)`.
+- To put it another way: `main = 100vh - (header + footer)`.
+- `calc()` is handling the math for us even though we are mixing `vh`, `rem` and `px` units.
+- Combined with CSS variables, `calc()` can save us from the headache of repeating CSS rules.
+- **Note:** The above is just an example of how `calc()` can affect a layout, but keep in mind that `calc()` is likely not the best way to go about it. We will talk more about layouts in future lessons.
+
+### 8.2. `min()`function
+
+- The `min()` function takes a list of values and returns the smallest one.
+
+```html
+<html>
+  <head>
+    <style>
+      #container {
+        display: flex;
+        box-sizing: border-box;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 6px solid black;
+        resize: both;
+        overflow: auto;
+        max-width: 100%;
+        max-height: 100%;
+      }
+      #iconHolder {
+        width: min(150px, 100%);
+        height: min(150px, 100%);
+        box-sizing: border-box;
+        border: 6px solid blue;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="text">resize me by clicking in the bottom right</div>
+    <div id="container">
+      <img
+        id="iconHolder"
+        src="https://avatars.githubusercontent.com/u/4441966?s=200&v=4"
+        alt="odin"
+      />
+    </div>
+  </body>
+</html>
+```
+
+- Focus on this line `width: min(150px, 100%);` we can make several observations:
+  - If there are `150px` available to the image, it will take up all `150px`.
+  - If there are not `150px` available, the image will switch to `100%` of the parent’s `width`.
+- In the first case `min()` selects `150px`, since `150px` is the smaller (the minimum) between `150px` and `100%` of the parent’s width; in the second, it chooses `100%`.
+- `min()` behaves as a boundary for the maximum allowed value, which in this example is `150px`.
+- You are able to do basic math inside a `min ( )`, for example: `width: min(80ch, 100vw - 2rem);`
+
+### 8.3. `max()` function
+
+- Max works the same way as min, only in reverse: it will select the largest possible value from within the parentheses. You can think of `max()` as ensuring a minimum allowed value for a property.
+- Consider the following property of a given element:
+
+```css
+width: max(100px, 4em, 50%);
+```
+
+- From this list of given sizes, `max()` will select the largest one: as long as `4em` or `50%` result in lengths longer than `100px`, `max()` will select (the bigger) one of them.
+- If they are smaller than `100px` (maybe as a cause of user’s font size preferences, or their browser’s window size or zoom level), then `100px` will win out as the largest.
+- You can think of `100px` in this example as a guard value: `width` here won’t ever be set to less than `100px`.
+- The max function is most useful when the viewing window is either exceptionally small, or the user increases the content size by using the browser’s zoom feature.You may not find a lot of use for max at first, but it is a good tool to be aware of for projects where accessibility is important.
+
+### 8.4. `clamp()` function
+
+- The `clamp()` function is a combination of `min()` and `max()` functions. It takes three values: a minimum, a preferred, and a maximum.
+
+```css
+h1 {
+  font-size: clamp(320px, 80vw, 60rem);
+}
+```
+
+1. the smallest value (`320px`)
+2. the ideal value (`80vw`)
+3. the largest value (`60rem`)
+
+- The `clamp()` CSS function uses these values to set the smallest value, ideal value and largest value. In the above example, this would mean the smallest acceptable font-size would be 320px and the largest would be 60rem. The ideal font-size would be 80vw.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
