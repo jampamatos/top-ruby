@@ -47,6 +47,17 @@
     - [8.2. `min()`function](#82-minfunction)
     - [8.3. `max()` function](#83-max-function)
     - [8.4. `clamp()` function](#84-clamp-function)
+  - [9. CUSTOM PROPERTIES (OR CSS VARIABLES)](#9-custom-properties-or-css-variables)
+    - [9.1. Fallback values](#91-fallback-values)
+    - [9.2. Scope](#92-scope)
+    - [9.3. The `:root` selector](#93-the-root-selector)
+    - [9.4. Inheritance](#94-inheritance)
+    - [9.5. Themes with custom properties](#95-themes-with-custom-properties)
+    - [9.6. Media Queries](#96-media-queries)
+  - [10. FRAMEWORKS AND PREPROCESSORS](#10-frameworks-and-preprocessors)
+    - [10.1. Frameworks](#101-frameworks)
+    - [10.2. Disadvantages of Frameworks](#102-disadvantages-of-frameworks)
+    - [10.3. Preprocessors](#103-preprocessors)
 
 ## 1. TABLES - BASIC STUFF
 
@@ -2452,6 +2463,368 @@ h1 {
 3. the largest value (`60rem`)
 
 - The `clamp()` CSS function uses these values to set the smallest value, ideal value and largest value. In the above example, this would mean the smallest acceptable font-size would be 320px and the largest would be 60rem. The ideal font-size would be 80vw.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+## 9. CUSTOM PROPERTIES (OR CSS VARIABLES)
+
+- CSS variables are a way to store values that can be reused throughout a document. They are defined using the `--` prefix followed by a custom name, and then assigned a value using the `:` character.
+- They allow us to reference a CSS value however many times we want throughout a file.
+- By using custom properties, instead of having to update every single instance of a specific value, we only need to update a single instance: the custom property itself.
+- We can even redefine custom properties under different contexts, which is incredibly useful for creating themes, such as the dark and light themes you see on many websites these days.
+- The syntax for declaring and accessing a custom property is really simple and not too different from how we write normal rule declarations:
+
+```css
+.error-modal {
+  --color-error-text: red;
+  --modal-border: 1px solid black;
+  --modal-font-size: calc(2rem + 5vw);
+
+  color: var(--color-error-text);
+  border: var(--modal-border);
+  font-size: var(--modal-font-size);
+}
+```
+
+- First, we declare our custom property with a double hyphen followed by a case-sensitive, hyphen-separated property name (`color-error-text` wouldn’t be the same as `Color-Error-Text`).
+- The use of single hyphens to separate words is very important here because spaces are not valid (`--color error text` would not work).
+- Then we can store any valid CSS value in our newly declared custom property, whether it be a simple color value, shorthand values, or even a more complex function.
+- When we want to access a custom property, we use the `var()` function as the value of a CSS property, and then place our custom property inside of the parenthesis (including the double hyphen at the beginning).
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+### 9.1. Fallback values
+
+- The `var()` function actually accepts two parameters: the first parameter we’ve already gone over, which is the custom property we want to assign, and the second parameter is an optional fallback value.
+- When a fallback value is provided in addition to a custom property, the fallback value will be used if the custom property is invalid or hasn’t been declared yet.
+- We can even pass in another custom property as a fallback, which can have its own fallback value as well.
+
+```css
+.fallback {
+  --color-text: white;
+
+  background-color: var(--undeclared-property, black);
+  color: var(--undeclared-again, var(--color-text, yellow));
+}
+```
+
+- In the above example, the first `var()` function will use the fallback value of `black` because the custom property `--undeclared-property` has not been declared yet.
+- In the second `var()` function, the fallback value of `yellow` will be used because the custom property `--undeclared-again` has not been declared yet, and the custom property `--color-text` has been declared, but it does not have a fallback value.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+### 9.2. Scope
+
+- Custom properties are scoped to the element they are declared on, and all of its children.
+- This means that if we declare a custom property on the `body` element, we can access it anywhere within the `body` element, including in any of its children.
+- In the first example above, you may have noticed that we declared and then accessed our custom properties within the same declaration block. That’s because the scope of a custom property is determined by the selector.
+- This scope includes the selector the custom property was declared for as well as any descendants of that selector. If you’re familiar with how scope works in JavaScript, this sort of behavior should feel a little similar.
+- In the example below, only the element with the `cool-paragraph` class would get styled with a red background since it’s a descendant of the element where our custom property is declared.
+
+```html
+<div class='cool-div'>
+  <p class='cool-paragraph'>Check out my cool, red background!</p>
+</div>
+
+<p class='boring-paragraph'>I'm not in scope so I'm not cool.</p>
+```
+
+```css
+.cool-div {
+  --main-bg: red;
+}
+
+.cool-paragraph {
+  background-color: var(--main-bg);
+}
+
+.boring-paragraph {
+  background-color: var(--main-bg);
+}
+```
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+### 9.3. The `:root` selector
+
+- The `:root` selector is a special selector that refers to the root element of the document, which is the like the `html` element except it has a higher specificity
+- While there may be times where you will want to limit the scope of a custom property, you may want to be able to use other custom properties on many, unrelated selectors.
+- A solution is declaring those custom properties on the `:root` selector.
+
+```html
+<p class='cool-paragraph'>Lorem ipsum dolor sit amet.</p>
+
+<p class='exciting-paragraph'>Lorem ipsum dolor sit amet.</p>
+```
+
+```css
+:root {
+  --main-color: red;
+}
+
+.cool-paragraph {
+  color: var(--main-color);
+}
+
+.exciting-paragraph {
+  background-color: var(--main-color);
+}
+```
+
+- By declaring our custom property on the `:root` selector in the example above, we can access it on any other valid selector within our CSS file, since any other selector would be considered a descendant of the `:root` selector.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+### 9.4. Inheritance
+
+- Custom properties are inherited by default, which means that if we declare a custom property on the `:root` selector, we can access it on any other valid selector within our CSS file, since any other selector would be considered a descendant of the `:root` selector.
+
+```html
+<div class="one">
+  <div class="two">
+    <div class="three"></div>
+    <div class="four"></div>
+  </div>
+</div>
+```
+
+```css
+.two {
+  --test: 10px;
+}
+
+.three {
+  --test: 2em;
+}
+```
+
+- In this case, the results of `var(--test)` are:
+  - For the `class="two"` element: `10px`
+  - For the `class="three"` element: `2em`
+  - For the `class="four"` element: `10px` (inherited from its parent)
+  - For the `class="one"` element: *invalid value*, which is the default value of any custom property
+
+Keep in mind that these are custom properties, not actual variables like you might find in other programming languages. The value is computed where it is needed, not stored for use in other rules. For instance, you cannot set a property for an element and expect to retrieve it in a sibling's descendant's rule. The property is only set for the matching selector and its descendants, like any normal CSS.
+
+### 9.5. Themes with custom properties
+
+- Beyond allowing us to access custom properties more globally, the :root selector gives us one way to add themes to our pages:
+
+```html
+<div class="container">
+  <p>You're now viewing this example with the <span class='theme-name'>dark</span> theme!</p>
+  <button class="theme-toggle">Toggle Theme</button>
+</div>
+```
+
+```css
+:root.dark {
+  --border-btn: 1px solid rgb(220, 220, 220);
+  --color-base-bg: rgb(18, 18, 18);
+  --color-base-text: rgb(240, 240, 240);
+  --color-btn-bg: rgb(36, 36, 36);
+}
+
+:root.light {
+  --border-btn: 1px solid rgb(36, 36, 36);
+  --color-base-bg: rgb(240, 240, 240);
+  --color-base-text: rgb(18, 18, 18);
+  --color-btn-bg: rgb(220, 220, 220);
+}
+
+body,
+.theme-toggle {
+  color: var(--color-base-text);
+}
+
+body {
+  background-color: var(--color-base-bg);
+  padding: 10px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+p {
+  font-size: 1.5rem;
+}
+
+.theme-toggle {
+  background-color: var(--color-btn-bg);
+  border: var(--border-btn);
+  font-size: 1.125rem;
+  padding: 10px 20px;
+}
+
+.theme-toggle:hover {
+  cursor: pointer;
+}
+
+.theme-toggle:focus {
+  outline: var(--border-btn);
+}
+```
+
+```js
+function setTheme() {
+  const root = document.documentElement;
+  const newTheme = root.className === 'dark' ? 'light' : 'dark';
+  root.className = newTheme;
+  
+  document.querySelector('.theme-name').textContent = newTheme;
+}
+
+document.querySelector('.theme-toggle').addEventListener('click', setTheme)
+```
+
+- First we added a `class` attribute on our `html` element so that our page has a default theme. Next in our CSS we created two scopes for our custom properties on the :`root` selector, one for when our html (or root) element has a class of dark and another for when it has a class of light. Our other selectors then use the values of any custom properties depending on which class is currently present on our root element.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+### 9.6. Media Queries
+
+- You can use the user’s theme setting from their operating system or user agent (like a browser) to set a theme.
+- This can be accomplished with the `prefers-color-scheme` media query, which simply checks whether a user has selected a theme preference on their OS/user agent.
+
+```html
+<div class="container">
+  <p>Based on your theme setting in your OS or user agent, you're now viewing this example with the <span class='theme-name'></span> theme!</p>
+</div>
+```
+
+```css
+:root {
+  --border-btn: 1px solid rgb(36, 36, 36);
+  --color-base-bg: rgb(240, 240, 240);
+  --color-base-text: rgb(18, 18, 18);
+  --color-btn-bg: rgb(220, 220, 220);
+  --theme-name: "light";
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --border-btn: 1px solid rgb(220, 220, 220);
+    --color-base-bg: rgb(18, 18, 18);
+    --color-base-text: rgb(240, 240, 240);
+    --color-btn-bg: rgb(36, 36, 36);
+    --theme-name: "dark";
+  }
+}
+
+body {
+  background-color: var(--color-base-bg);
+  color: var(--color-base-text);
+  padding: 10px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+p {
+  font-size: 1.5rem;
+}
+
+.theme-name::after {
+  content: var(--theme-name);
+}
+```
+
+- In the example above, we set our default theme to light, but then we use the `prefers-color-scheme` media query to check if the user prefers a dark theme. If they do, we override our default theme with the dark theme.
+- Using the `prefers-color-scheme` media query can be pretty helpful for users since it doesn’t require them to manually change the theme to their preferred one.
+- That said, you need to be aware of a few things when it comes to using this media query:
+  1. Only `dark` and `light` are valid values for the media query, so you can’t use it to implement any themes beyond these two basic ones.
+  2. The `light` value for the media query is actually for when a user has a light theme specified or when they have no preference set.
+  3. It doesn’t allow users to change the theme themselves, which can still be important in cases where a user might want to use the theme opposite of their OS/user agent preferred one for whatever reason.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+## 10. FRAMEWORKS AND PREPROCESSORS
+
+### 10.1. Frameworks
+
+- Frameworks, like [Bootstrap](https://getbootstrap.com/) and [Tailwind](https://tailwindcss.com/) are a collection of pre-written code that you can use to build your website, and they do a lot of the heavy lifting of packaging up commonly used CSS code for you, even icons and interactions (like menu dropdowns).
+- They are designed to abstract away the process of coding intuitive, reusable, and responsive elements.
+- A CSS framework is ultimately just a bundle of CSS that you can use and access, using the classes defined by the framework, ie , many frameworks provide a class called `.btn` that will add all the needed styles to your buttons, without you having to write any CSS.
+- In general, all you have to do to use a framework is understand how it expects you to lay out your site, and which classes it uses to designate its particular batch of styles.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+### 10.2. Disadvantages of Frameworks
+
+- The biggest disadvantage of using a framework is that you are limited to the styles that the framework provides. If you want to do something that the framework doesn’t support, you’ll have to write your own CSS to do it.
+- Also, too many new developers also jump into learning frameworks too early in their education; and as a result, many developers do not get enough CSS practice under their belts to solidify the fundamentals of this very important language.
+- Additionally, the process of overriding a framework’s styling or debugging style issues on your page becomes very difficult if you haven’t really mastered CSS fundamentals; it's imperative to understand what a framework is doing “under the hood” so that you are equipped to handle these issues later on.
+- Ultimately, frameworks are a great tool to have in your toolbox, but you should not rely on them to do all the work for you. You should still be able to write your own CSS, and you should be able to understand what a framework is doing under the hood.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+### 10.3. Preprocessors
+
+- Preprocessors (aka precompilers) are tools that allow you to write CSS in a more convenient way, and then compile it into regular CSS that can be used in your site.
+- They reduce code repetition and provide all sorts of time-saving and code-saving features. A few examples: preprocessors allow you to write loops, join multiple stylesheets, and nest classes.
+- CSS preprocessors are extensions to vanilla CSS that provide some extra functionality such as nesting, mixins, and variables. When you run the processor, it takes your code and turns it into vanilla CSS that you can import into your project.
+- Preprocessors do have some unique and helpful tools, but many of their most helpful features have been implemented in vanilla CSS, so it might not be worth the overhead of learning one unless you think you really need these features.
+- Some of the standard preprocessors in use are [SASS](https://sass-lang.com/), [LESS](https://lesscss.org/) and [Stylus](https://stylus-lang.com/).
 
 <div style="text-align: right">
 
