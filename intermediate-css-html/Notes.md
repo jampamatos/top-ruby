@@ -58,6 +58,22 @@
     - [10.1. Frameworks](#101-frameworks)
     - [10.2. Disadvantages of Frameworks](#102-disadvantages-of-frameworks)
     - [10.3. Preprocessors](#103-preprocessors)
+  - [11. FORM BASICS](#11-form-basics)
+    - [11.1. Introduction](#111-introduction)
+    - [11.2. The Form Element](#112-the-form-element)
+    - [11.3. Form Controls](#113-form-controls)
+      - [11.3.1. Input Element](#1131-input-element)
+      - [11.3.2. Labels](#1132-labels)
+      - [11.3.3. Placeholder Attribute](#1133-placeholder-attribute)
+      - [11.3.4. The Name Attribute](#1134-the-name-attribute)
+      - [11.3.5. Using Form Controls Outside of a Form](#1135-using-form-controls-outside-of-a-form)
+      - [11.3.6. The Type Attribute](#1136-the-type-attribute)
+      - [11.3.7. Selection Elements](#1137-selection-elements)
+      - [11.3.8. Buttons](#1138-buttons)
+    - [11.4. Organizing Form Elements](#114-organizing-form-elements)
+      - [11.4.1. Fieldset](#1141-fieldset)
+      - [11.4.2. Legend](#1142-legend)
+    - [11.5. Note on Styling Forms](#115-note-on-styling-forms)
 
 ## 1. TABLES - BASIC STUFF
 
@@ -2825,6 +2841,733 @@ p {
 - CSS preprocessors are extensions to vanilla CSS that provide some extra functionality such as nesting, mixins, and variables. When you run the processor, it takes your code and turns it into vanilla CSS that you can import into your project.
 - Preprocessors do have some unique and helpful tools, but many of their most helpful features have been implemented in vanilla CSS, so it might not be worth the overhead of learning one unless you think you really need these features.
 - Some of the standard preprocessors in use are [SASS](https://sass-lang.com/), [LESS](https://lesscss.org/) and [Stylus](https://stylus-lang.com/).
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+## 11. FORM BASICS
+
+### 11.1. Introduction
+
+- Forms are a way for users to submit information to a website or web application. In other word,s they're the gateway to the backend.
+- You need to specify the proper type of input for each field, and you need to make sure that the form is submitted to the correct URL.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+### 11.2. The Form Element
+
+- The `<form>` element is used to create a form on a web page. It is a container for all the elements that you want to include in your form.
+- It accepts two attributes:
+  - `action`: The URL that the form will be submitted to.
+  - `method`: The [HTTP request method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) that will be used to submit the form. The two most common values are `GET` and `POST`.
+- We use GET when we want to retrieve something from a server. For example, Google uses a GET request when you search as it gets the search results.
+- We use POST when we want to change something on the server, for example, when a user makes an account or makes a payment on a website.
+- The markup for a form looks like this:
+
+```html
+<form action="example.com/path" method="post">
+
+</form>
+```
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+### 11.3. Form Controls
+
+- Form controls are the different types of inputs that you can use in a form. They include things like text fields, checkboxes, radio buttons, and submit buttons.
+- We can use the `<input>` element to create a form control. It accepts a `type` attribute that specifies the type of input that we want to create.
+- We will cover the most common form controls in this section, but you can find a full list of all the different types of inputs that you can use in a form [here](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input).
+
+#### 11.3.1. Input Element
+
+- The `<input>` element is used to create several different form controls. The `type` attribute is used to specify what kind of input we want to create.
+- It's the most versatile form control, and it can be used to create text fields, checkboxes, radio buttons, submit buttons, and more.
+- The `type` attribute accepts a wide range of values, but the most common ones are:
+  - `text`: Creates a single-line text field.
+  - `password`: Creates a single-line text field that masks the user’s input.
+  - `checkbox`: Creates a checkbox.
+  - `radio`: Creates a radio button.
+  - `submit`: Creates a submit button.
+  - `email`: Creates a text field for entering an email address.
+  - `tel`: Creates a text field for entering a telephone number.
+  - `number`: Creates a text field for entering a number.
+  - `date`: Creates a text field for entering a date.
+  - `file`: Creates a file upload control.
+- A text input looks like this:
+
+```html
+<form action="example.com/path" method="post">
+  <input type="text">
+</form>
+```
+
+- Text inputs accept any text input. For example, you would use it to collect things like users’ first and last names.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+#### 11.3.2. Labels
+
+- The `<label>` element is used to label form controls. It is a text string that describes the purpose of the form control.
+- To create a label, you need to specify which form control it is labeling. You do this by using the `for` attribute on the `<label>` element, and then setting the value of the attribute to the value of the `id` attribute on the form control.
+
+```html
+<form action="example.com/path" method="post">
+  <label for="first_name">First Name:</label>
+  <input type="text" id="first_name">
+</form>
+```
+
+Will generate this:
+
+<form action="example.com/path" method="post">
+  <label for="first_name">First Name:</label>
+  <input type="text" id="first_name">
+</form>
+<br>
+
+- Labels accept a `for` attribute, which associates it with a particular input, that uses an `id` attribute with the same value as the label’s `for` attribute.
+- When you click on the label, the form control will be focused. This is useful for users who are using a screen reader, as it will read out the label when the form control is focused.
+- The `<label>` element is a block-level element, so it will appear on a new line by default. If you want to place the label next to the form control, you can use the `display` property to change the display type to `inline` or `inline-block`.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+#### 11.3.3. Placeholder Attribute
+
+- The `placeholder` attribute is used to provide a hint to the user about what kind of information should be entered in the form control.
+- This is done by setting the value of the `placeholder` attribute to a string that describes the expected value. The value will be displayed in the form control until the user enters a value.
+
+```html
+<label for="first_name">First Name:</label>
+<input type="text" id="first_name" placeholder="Bob...">
+```
+
+<label for="first_name">First Name:</label>
+<input type="text" id="first_name" placeholder="Bob...">
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+#### 11.3.4. The Name Attribute
+
+- The `name` attribute is used to give a name to a form control. This name is sent along with the value of the form control to the server when the form is submitted. The name is used to identify the form control on the server.
+- You can think of it as a variable name for the input. Form input should always have a `name` attribute; otherwise, it will be ignored when the form is submitted.
+
+```html
+<label for="first_name">First Name:</label>
+<input type="text" id="first_name" name="first_name">
+```
+
+<label for="first_name">First Name:</label>
+<input type="text" id="first_name" name="first_name">
+<br>
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+#### 11.3.5. Using Form Controls Outside of a Form
+
+- You can use form controls outside of a form. This is useful if you want to create a form that is not submitted to a server, but instead, you want to use the form to perform some kind of action on the page.
+- For example you might want to have an input that gets some data from a user and display that somewhere else on the page with JavaScript
+
+```html
+<div>
+  <label for="username">What's your name?</label>
+  <input type="text"id="username">
+  <button class="greet-btn">Greet Me</button>
+</div>
+
+<h1 class="greeting"></h1>
+```
+
+```js
+const name = document.querySelector("#username")
+const greetMeButton = document.querySelector(".greet-btn")
+const greetingOutput = document.querySelector(".greeting")
+
+greetMeButton.addEventListener('click', (event) => {
+   greetingOutput.innerText = `Hello ${name.value}`;
+})
+```
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+#### 11.3.6. The Type Attribute
+
+- The `type` attribute is used to specify the type of input that we want to create. It accepts a wide range of values, but the most common ones are:
+  - `text`: Creates a single-line text field.
+  - `password`: Creates a single-line text field that masks the user’s input.
+  - `checkbox`: Creates a checkbox.
+  - `radio`: Creates a radio button.
+  - `submit`: Creates a submit button.
+  - `email`: Creates a text field for entering an email address.
+  - `tel`: Creates a text field for entering a telephone number.
+  - `number`: Creates a text field for entering a number.
+  - `date`: Creates a text field for entering a date.
+  - `file`: Creates a file upload control.
+- `Email inputs` are specialized text inputs just for email addresses. They are different from text inputs in that they will display a different keyboard which will include the @ symbol on mobile devices to make entering email addresses easier.
+
+```html
+<label for="user_email">Email Address:</label>
+<input type="email" id="user_email" name="email" placeholder="you@example.com">
+```
+
+- `Password inputs` are another specialized text input. They differ from regular text inputs in that they mask the inputted data with another character – usually an asterisk (*) or bullet point (•) – to prevent anyone from seeing what has been entered.
+
+```html
+<label for="user_password">Password:</label>
+<input type="password" id="user_password" name="password">
+```
+
+- `Number input` only accepts number values and ignores any other characters the user tries to enter.
+
+```html
+<label for="amount">Amount:</label>
+<input type="number" id="amount" name="amount">
+```
+
+- `Date input` only accepts date values and ignores any other characters the user tries to enter. It also displays a calendar widget that allows the user to select a date from a calendar.
+
+```html
+<label for="dob">Date of Birth:</label>
+<input type="date" id="dob" name="dob">
+```
+
+- `Textarea` is a multi-line text input. It is used to allow the user to enter a large amount of text. It can also be resized by clicking and dragging the bottom right corner to make it bigger or smaller.
+
+```html
+<textarea></textarea>
+```
+
+- Unlike input elements, Textarea elements do have a closing tag. This allows you to wrap some initial content you want the text area to display:
+
+```html
+<textarea>Some initial content</textarea>
+```
+
+- Text area elements accept a couple of unique attributes that other form controls do not. These are the rows and cols attributes. They allow you to control the initial height (rows) and width (cols) of the text area:
+
+```html
+<textarea rows="20" cols="60"></textarea>
+```
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+#### 11.3.7. Selection Elements
+
+Sometimes you will want users to select a value from a predefined list. This is where select elements will be useful.
+
+- The **Select Dropdown** element renders a dropdown list where users can select an option.
+- Syntactically, select elements have similar markup to unordered lists, in which it wraps option elements which are the options that can be selected.
+- To create a select dropdown, we use the `<select>` element. Any options we want to display within the select element are defined using `<option>` elements:
+
+```html
+<select name="Car">
+  <option value="mercedes">Mercedes</option>
+  <option value="tesla">Tesla</option>
+  <option value="volvo">Volvo</option>
+  <option value="bmw">BMW</option>
+  <option value="mini">Mini</option>
+  <option value="ford">Ford</option>
+</select>
+```
+
+This will render:
+
+<select name="Car">
+  <option value="mercedes">Mercedes</option>
+  <option value="tesla">Tesla</option>
+  <option value="volvo">Volvo</option>
+  <option value="bmw">BMW</option>
+  <option value="mini">Mini</option>
+  <option value="ford">Ford</option>
+</select>
+<br>
+
+- All the option elements need to have a value attribute. This value will be sent to the server when the form is submitted.
+- We can set one of the options to be the default selected element when the browser first renders the form by giving one of the options the selected attribute:
+
+```html
+<select name="Car">
+  <option value="mercedes">Mercedes</option>
+  <option value="tesla">Tesla</option>
+  <option value="volvo" selected>Volvo</option>
+  <option value="bmw">BMW</option>
+  <option value="mini">Mini</option>
+  <option value="ford">Ford</option>
+</select>
+```
+
+This will render:
+
+<select name="Car">
+  <option value="mercedes">Mercedes</option>
+  <option value="tesla">Tesla</option>
+  <option value="volvo" selected>Volvo</option>
+  <option value="bmw">BMW</option>
+  <option value="mini">Mini</option>
+  <option value="ford">Ford</option>
+</select>
+<br>
+<br>
+
+- The `<optgroup>` element is used to group related options together. The optgroup element takes a `label` attribute which the browser uses as the label for each group:
+
+```html
+<select name="fashion">
+  <optgroup label="Clothing">
+    <option value="t_shirt">T-Shirts</option>
+    <option value="sweater">Sweaters</option>
+    <option value="coats">Coats</option>
+  </optgroup>
+  <optgroup label="Foot Wear">
+    <option value="sneakers">Sneakers</option>
+    <option value="boots">Boots</option>
+    <option value="sandals">Sandals</option>
+  </optgroup>
+</select>
+```
+
+This will render:
+
+<select name="fashion">
+  <optgroup label="Clothing">
+    <option value="t_shirt">T-Shirts</option>
+    <option value="sweater">Sweaters</option>
+    <option value="coats">Coats</option>
+  </optgroup>
+  <optgroup label="Foot Wear">
+    <option value="sneakers">Sneakers</option>
+    <option value="boots">Boots</option>
+    <option value="sandals">Sandals</option>
+  </optgroup>
+</select>
+<br>
+<br>
+
+- **Radio Buttons** are a group of radio buttons that allow the user to select one option from a list of options. The user can only select one option from the list of options. The options are displayed in a vertical list.
+- When we have a smaller list of 5 or fewer options to choose from, it is often a better user experience to have them displayed on the page instead of hidden behind a dropdown.4
+- To create a radio button, we use the `<input>` element with the type attribute set to radio. The value attribute is used to set the value that will be sent to the server when the form is submitted. The name attribute is used to group the radio buttons together so that only one radio button in the group can be selected at a time:
+
+```html
+<h1>Ticket Type</h1>
+<div>
+  <input type="radio" id="child" name="ticket_type" value="child">
+  <label for="child">Child</label>
+</div>
+
+<div>
+  <input type="radio" id="adult" name="ticket_type" value="adult">
+  <label for="adult">Adult</label>
+</div>
+
+<div>
+  <input type="radio" id="senior" name="ticket_type" value="senior">
+  <label for="senior">Senior</label>
+</div>
+```
+
+This will render:
+
+<h2>Ticket Type</h1>
+<div>
+  <input type="radio" id="child" name="ticket_type" value="child">
+  <label for="child">Child</label>
+</div>
+
+<div>
+  <input type="radio" id="adult" name="ticket_type" value="adult">
+  <label for="adult">Adult</label>
+</div>
+
+<div>
+  <input type="radio" id="senior" name="ticket_type" value="senior">
+  <label for="senior">Senior</label>
+</div>
+
+- When we select one of the radio buttons and then select another, it will deselect the first one. Radio buttons know to do this because they have the same name attribute. This is how the browser knows these elements are part of the same group of options.
+- We can set the default selected radio button by adding the `checked` attribute to it:
+
+```html
+<h1>Ticket Type</h1>
+<div>
+  <input type="radio" id="child" name="ticket_type" value="child">
+  <label for="child">Child</label>
+</div>
+
+<div>
+  <input type="radio" id="adult" name="ticket_type" value="adult" checked>
+  <label for="adult">Adult</label>
+</div>
+
+<div>
+  <input type="radio" id="senior" name="ticket_type" value="senior">
+  <label for="senior">Senior</label>
+</div>
+```
+
+This will render:
+
+<h2>Ticket Type</h1>
+<div>
+  <input type="radio" id="child" name="ticket_type" value="child">
+  <label for="child">Child</label>
+</div>
+
+<div>
+  <input type="radio" id="adult" name="ticket_type" value="adult" checked>
+  <label for="adult">Adult</label>
+</div>
+
+<div>
+  <input type="radio" id="senior" name="ticket_type" value="senior">
+  <label for="senior">Senior</label>
+</div>
+
+- **Checkboxes** are a group of checkboxes that allow the user to select one or more options from a list of options. The user can select multiple options from the list of options. The options are displayed in a vertical list.
+- To create a checkbox, we use the `<input>` element with the type attribute set to checkbox. The value attribute is used to set the value that will be sent to the server when the form is submitted. The name attribute is used to group the checkboxes together so that multiple checkboxes in the group can be selected at a time:
+
+```html
+<h1>Pizza Toppings</h1>
+
+<div>
+  <input type="checkbox" id="sausage" name="topping" value="sausage">
+  <label for="sausage">Sausage</label>
+</div>
+
+<div>
+  <input type="checkbox" id="onions" name="topping" value="onions">
+  <label for="onions">Onions</label>
+</div>
+
+<div>
+  <input type="checkbox" id="pepperoni" name="topping" value="pepperoni">
+  <label for="pepperoni">Pepperoni</label>
+</div>
+
+<div>
+  <input type="checkbox" id="mushrooms" name="topping" value="mushrooms">
+  <label for="mushrooms">Mushrooms</label>
+</div>
+```
+
+This will render:
+
+<h2>Pizza Toppings</h1>
+
+<div>
+  <input type="checkbox" id="sausage" name="topping" value="sausage">
+  <label for="sausage">Sausage</label>
+</div>
+
+<div>
+  <input type="checkbox" id="onions" name="topping" value="onions">
+  <label for="onions">Onions</label>
+</div>
+
+<div>
+  <input type="checkbox" id="pepperoni" name="topping" value="pepperoni">
+  <label for="pepperoni">Pepperoni</label>
+</div>
+
+<div>
+  <input type="checkbox" id="mushrooms" name="topping" value="mushrooms">
+  <label for="mushrooms">Mushrooms</label>
+</div>
+<br>
+<br>
+
+- We can also have a single checkbox when we want users to toggle if they want something to be true or false. Like signing up to a newsletter when they create an account for example:
+
+```html
+<div>
+  <input type="checkbox" id="newsletter" name="news_letter">
+  <label for="newsletter">Send me the news letter</label>
+</div>
+```
+
+This will render:
+
+<div>
+  <input type="checkbox" id="newsletter" name="news_letter">
+  <label for="newsletter">Send me the news letter</label>
+</div>
+<br>
+
+- We can set checkboxes to be checked by default on page load by giving them a checked attribute:
+
+```html
+<div>
+  <input type="checkbox" id="newsletter" name="news_letter" checked>
+  <label for="newsletter">Send me the news letter</label>
+</div>
+```
+
+This will render:
+
+<div>
+  <input type="checkbox" id="newsletter" name="news_letter" checked>
+  <label for="newsletter">Send me the news letter</label>
+</div>
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+#### 11.3.8. Buttons
+
+- The button element creates clickable buttons that the user can interact with to submit forms and trigger other actions.
+- To create a button, we use the `<button>` element. The content or text we want to have displayed inside the button will go within the opening and closing tags:
+
+```html
+<button>Click Me</button>
+```
+
+<br>
+<button>Click Me</button>
+<br>
+<br>
+
+- The button element also accepts a type attribute that tells the browser which kind of button it is dealing with. There are three types of buttons available to us:
+- **submit** - This is the default type of button. It submits the form that the button is inside of.
+
+```html
+<button type="submit">Submit</button>
+```
+
+<button type="submit">Submit</button>
+<br>
+<br>
+
+- **reset** - This type of button resets the form that the button is inside of. It will clear all the values that have been entered into the form.
+
+```html
+<button type="reset">Reset</button>
+```
+
+<button type="reset">Reset</button>
+<br>
+<br>
+
+- **button** - This type of button does not submit or reset the form. It is used to trigger other actions. It’s commonly used with JS for creating interactive UI’s.
+
+```html
+<button type="button">Click to Toggle</button>
+```
+
+**Note:** It is important to remember that a button within a form with the type value of submit (which happens to be the default value) will always try to make a new request and submit data back to the server. Hence, for buttons that are used within a form for different purposes other than submitting the data, the type attribute should always be specified to avoid unwanted effects of submitting a form.
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+### 11.4. Organizing Form Elements
+
+- Using the correct inputs for the data we want users to enter goes a long way towards making our forms user friendly.
+- However, in larger forms, users can easily get overwhelmed and discouraged if there are many inputs to fill in.
+- Luckily, HTML provides a couple of elements that make it easy to organize forms into sections that are visually distinct and manageable to digest.
+
+#### 11.4.1. Fieldset
+
+- The `<fieldset>` element is used to group related elements in a form together. It is used to create a visual distinction between different sections of a form.
+- To create a fieldset, we use the `<fieldset>` element. The content or text we want to have displayed inside the fieldset will go within the opening and closing tags:
+
+```html
+<fieldset>
+  <label for="first_name">First Name</label>
+  <input type="text" id="first_name" name="first_name">
+
+  <label for="last_name">Last Name</label>
+  <input type="text" id="last_name" name="last_name">
+</fieldset>
+```
+
+<fieldset>
+  <label for="first_name">First Name</label>
+  <input type="text" id="first_name" name="first_name">
+
+  <label for="last_name">Last Name</label>
+  <input type="text" id="last_name" name="last_name">
+</fieldset>
+<br>
+
+#### 11.4.2. Legend
+
+- The `<legend>` element is used to provide a title for the `<fieldset>` element. It is used to create a visual distinction between different sections of a form.
+- To create a legend, we use the `<legend>` element. The content or text we want to have displayed inside the legend will go within the opening and closing tags:
+
+```html
+<fieldset>
+  <legend>Contact Details</legend>
+
+  <label for="name">Name:</label>
+  <input type="text" id="name" name="name">
+
+  <label for="phone_number">Phone Number:</label>
+  <input type="tel" id="phone_number" name="phone_number">
+
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email">
+</fieldset>
+
+<fieldset>
+  <legend>Delivery Details</legend>
+
+  <label for="street_address">Street Address:</label>
+  <input type="text" id="street_address" name="street_address">
+
+  <label for="city">City:</label>
+  <input type="text" id="city" name="city">
+
+  <label for="zip_code">Zip Code:</label>
+  <input type="text" id="zip_code" name="zip_code">
+</fieldset>
+```
+
+<fieldset>
+  <legend>Contact Details</legend>
+
+  <label for="name">Name:</label>
+  <input type="text" id="name" name="name">
+
+  <label for="phone_number">Phone Number:</label>
+  <input type="tel" id="phone_number" name="phone_number">
+
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email">
+</fieldset>
+
+<fieldset>
+  <legend>Delivery Details</legend>
+
+  <label for="street_address">Street Address:</label>
+  <input type="text" id="street_address" name="street_address">
+
+  <label for="city">City:</label>
+  <input type="text" id="city" name="city">
+
+  <label for="zip_code">Zip Code:</label>
+  <input type="text" id="zip_code" name="zip_code">
+</fieldset>
+<br>
+
+- A common use-case for these elements is using a fieldset to group radio buttons and using a legend to communicate to the user what each of the options is ultimately for:
+
+```html
+<fieldset>
+  <legend>What would you like to drink?</legend>
+
+  <div>
+    <input type="radio" name="drink" id="coffee" value="coffee">
+    <label for="coffee">Coffee</label>
+  </div>
+
+  <div>
+    <input type="radio" name="drink" id="tea" value="tea">
+    <label for="tea">Tea</label>
+  </div>
+
+  <div>
+    <input type="radio" name="drink" id="soda" value="soda">
+    <label for="soda">Soda</label>
+  </div>
+
+</fieldset>
+```
+
+<fieldset>
+  <legend>What would you like to drink?</legend>
+
+  <div>
+    <input type="radio" name="drink" id="coffee" value="coffee">
+    <label for="coffee">Coffee</label>
+  </div>
+
+  <div>
+    <input type="radio" name="drink" id="tea" value="tea">
+    <label for="tea">Tea</label>
+  </div>
+
+  <div>
+    <input type="radio" name="drink" id="soda" value="soda">
+    <label for="soda">Soda</label>
+  </div>
+
+</fieldset>
+
+<div style="text-align: right">
+
+[BACK TO TOP](#table-of-contents)
+
+</div>
+
+---
+
+### 11.5. Note on Styling Forms
+
+- **Default Browser Styles** - Browsers have default styles for form elements. These styles are applied to all form elements, regardless of whether they are inside a form or not. To have a consistent design among all browsers, we have to override these default styles and style them ourselves.
+- **Tricky and downright impossible to style form controls**:
+  - Text-based form controls like text, email, password and text areas are reasonably straightforward to style. They operate like any other HTML element, and most CSS properties can be used on them.
+  - Things get more tricky when creating custom styles for radio buttons and checkboxes. But there are many [guides](https://moderncss.dev/pure-css-custom-checkbox-style/) out there you can use to achieve your desired design. There have also been [new CSS properties](https://developer.mozilla.org/en-US/docs/Web/CSS/accent-color) made available in recent times to make styling radio buttons and checkboxes much easier.
+  - Certain aspects of other elements are downright impossible to style, for example, calendar or date pickers. If we want custom styles for these, we will have to build custom form controls with JavaScript or use one of the many JavaScript libraries that provide us with ready-made solutions.
 
 <div style="text-align: right">
 
